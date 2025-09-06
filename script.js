@@ -7,6 +7,32 @@ let correctAnswersCount = 0;
 let currentQuestionIndex = 0;
 let totalQuestions = 0;
 let quizQuestions = [];
+let selectedGender = null;
+let isMusicOn = true;
+
+const backgroundMusic = document.getElementById("background-music");
+
+const characterNamesMap = {
+  Єгиптянин: "egypt",
+  Грек: "greek",
+  Римлянин: "roman",
+  Єврей: "hebrew",
+};
+
+const characterEffectsMap = {
+  Єгиптянин: "egypt-short.mp3",
+  Грек: "greeks-short.mp3",
+  Римлянин: "romans-short.mp3",
+  Єврей: "hebrews-short.mp3",
+};
+
+const crossfadeMusic = newSrc => {
+  backgroundMusic.src = newSrc;
+  backgroundMusic.load();
+  if (isMusicOn) {
+    backgroundMusic.play().catch(e => console.error("Failed to play music:", e));
+  }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   const heroSection = document.getElementById("hero");
@@ -20,62 +46,78 @@ document.addEventListener("DOMContentLoaded", () => {
   let missionIntro = document.getElementById("mission-intro");
   let questionsOverlay = document.getElementById("questions-overlay");
 
+  const genderMaleButton = document.getElementById("gender-male");
+  const genderFemaleButton = document.getElementById("gender-female");
+
   const chooseCharacterButton = document.getElementById("choose-character");
   const confirmCharacterButton = document.getElementById("confirm-character");
   const startGameButton = document.getElementById("start-game");
   const retryButton = document.getElementById("retry");
-  const musicButton = document.getElementById("toggle-music");
-  const backgroundMusic = document.getElementById("background-music");
-  const musicIcon = musicButton.querySelector("i");
-
-  // Мапа для перетворення українських назв на латинські для CSS-класів
-  const characterNamesMap = {
-    Єгиптянин: "egypt",
-    Грек: "greek",
-    Римлянин: "roman",
-    Єврей: "hebrew",
-  };
-
-  // Епічні тексти для кожної нації
-  const missionIntros = {
-    Єгиптянин: playerName => `
-      <h2>Ласкаво просимо, ${playerName}, у Вічну Долину Нілу!</h2>
-      <p>Фараон закликає тебе пройти випробування Єгиптом. Чи готовий ти розгадати таємниці пірамід і довести свою мудрість?</p>
-      <button id="start-mission">Почати Місію</button>
-    `,
-    Грек: playerName => `
-      <h2>Слава тобі, ${playerName}, нащадку героїв Еллади!</h2>
-      <p>Олімп спостерігає за тобою! Доведи свою доблесть та інтелект у випробуваннях, гідних Афінського Агори. Чи готовий ти до великих звершень?</p>
-      <button id="start-mission">Почати Місію</button>
-    `,
-    Римлянин: playerName => `
-      <h2>Ave, ${playerName}, громадянине Риму!</h2>
-      <p>Імперія кличе! Приготуйся до важких випробувань, що загартують твій дух і розум. Чи гідний ти носити лаври Цезаря?</p>
-      <button id="start-mission">Почати Місію</button>
-    `,
-    Єврей: playerName => `
-      <h2>Шалом, ${playerName}, обранє дитя Царя!</h2>
-      <p>Шлях до знання довгий, але істина веде праведних. Доведи свою вірність та мудрість, відповідаючи на питання, що сягають корінням віків. Чи готовий ти до випробування віри?</p>
-      <button id="start-mission">Почати Місію</button>
-    `,
-  };
+  const backButton = document.getElementById("back-to-characters");
+  const backToHeroButton = document.getElementById("back-to-hero");
+  const toggleMusicButton = document.getElementById("toggle-music");
+  const bottomButtonsContainer = document.getElementById("bottom-buttons-container");
+  const musicIcon = toggleMusicButton.querySelector("i");
+  const shortEffect = document.getElementById("short-effect");
 
   const updateMusicButtonState = () => {
-    if (!backgroundMusic.paused) {
-      musicButton.classList.add("playing");
-      musicButton.classList.remove("paused");
+    if (isMusicOn) {
       musicIcon.classList.remove("fa-volume-mute");
       musicIcon.classList.add("fa-volume-up");
     } else {
-      musicButton.classList.add("paused");
-      musicButton.classList.remove("playing");
       musicIcon.classList.remove("fa-volume-up");
       musicIcon.classList.add("fa-volume-mute");
     }
   };
 
+  const playShortEffect = effectSrc => {
+    shortEffect.src = `audio/${effectSrc}`;
+    shortEffect.play().catch(e => console.error("Failed to play short effect:", e));
+  };
+
+  const missionIntros = {
+    Єгиптянин: (playerName, gender) => {
+      return `
+        <h2>Ласкаво просимо, ${playerName}, у Вічну Долину Нілу!</h2>
+        <p>Фараон закликає тебе пройти випробування Єгиптом. Чи готов${
+          gender === "male" ? "ий" : "а"
+        } ти розгадати таємниці пірамід і довести свою мудрість?</p>
+        <button id="start-mission">Почати Місію</button>
+      `;
+    },
+    Грек: (playerName, gender) => {
+      const genderText = gender === "male" ? "герою" : "героїне";
+      return `
+        <h2>Слава тобі, ${playerName}, нащадку ${genderText} Еллади!</h2>
+        <p>Олімп спостерігає за тобою! Доведи свою доблесть та інтелект у випробуваннях, гідних Афінського Агори. Чи готов${
+          gender === "male" ? "ий" : "а"
+        } ти до великих звершень?</p>
+        <button id="start-mission">Почати Місію</button>
+      `;
+    },
+    Римлянин: (playerName, gender) => {
+      const genderText = gender === "male" ? "громадянине" : "громадянко";
+      return `
+        <h2>Ave, ${playerName}, ${genderText} Риму!</h2>
+        <p>Імперія кличе! Приготуйся до важких випробувань, що загартують твій дух і розум. Чи гідн${
+          gender === "male" ? "ий" : "а"
+        } ти носити лаври Цезаря?</p>
+        <button id="start-mission">Почати Місію</button>
+      `;
+    },
+    Єврей: (playerName, gender) => {
+      const genderText = gender === "male" ? "дитя Царя" : "дочко Царя";
+      return `
+        <h2>Шалом, ${playerName}, обран${gender === "male" ? "е" : "а"} ${genderText}!</h2>
+        <p>Шлях до знання довгий, але істина веде праведних. Доведи свою вірність та мудрість, відповідаючи на питання, що сягають корінням віків. Чи готов${
+          gender === "male" ? "ий" : "а"
+        } ти до випробування віри?</p>
+        <button id="start-mission">Почати Місію</button>
+      `;
+    },
+  };
+
   const displayQuestion = index => {
-    // Очищаємо попередні запитання
     questionsOverlay.innerHTML = "";
     if (index < quizQuestions.length) {
       const questionData = quizQuestions[index];
@@ -96,9 +138,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       questionsOverlay.appendChild(questionBlock);
     } else {
-      // Показуємо результат, якщо всі питання пройдені
-      quizSection.classList.add("hidden");
-      showResult(selectedCharacter, playerNameInput.value, correctAnswersCount, totalQuestions);
+      showSection(resultSection);
+      showResult(
+        selectedCharacter,
+        playerNameInput.value,
+        correctAnswersCount,
+        totalQuestions,
+        selectedGender
+      );
     }
   };
 
@@ -134,46 +181,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleCharacterConfirmation = () => {
     const activeSlide = document.querySelector(".swiper-slide-active");
     if (!activeSlide) {
-      alert("Будь ласка, оберіть персонажа!");
+      Swal.fire({
+        title: "Помилка!",
+        text: "Будь ласка, оберіть персонажа!",
+        icon: "error",
+        confirmButtonText: "Зрозуміло",
+      });
       return;
     }
     selectedCharacter = activeSlide.querySelector("p").textContent;
-    characterSelectionSection.classList.add("hidden");
-    // Явно приховуємо quizSection, щоб уникнути багу
-    quizSection.classList.add("hidden");
-    resultSection.classList.add("hidden");
-    nameInputSection.classList.remove("hidden");
+
+    if (characterEffectsMap[selectedCharacter]) {
+      playShortEffect(characterEffectsMap[selectedCharacter]);
+    }
+
+    selectedGender = null;
+    genderMaleButton.classList.remove("active");
+    genderFemaleButton.classList.remove("active");
+
+    showSection(nameInputSection);
 
     const themeClass = characterNamesMap[selectedCharacter];
     main.className = "";
     main.classList.add(`theme-${themeClass}`);
-
-    const audioFiles = {
-      Єгиптянин: "egypts.mp3",
-      Грек: "greeks.mp3",
-      Римлянин: "romans.mp3",
-      Єврей: "hebrews.mp3",
-    };
-    backgroundMusic.src = `audio/${audioFiles[selectedCharacter]}`;
-    backgroundMusic
-      .play()
-      .then(() => {
-        musicButton.classList.remove("hidden");
-        updateMusicButtonState();
-      })
-      .catch(error => {
-        console.error("Failed to play music:", error);
-      });
   };
 
   const handleStartGame = () => {
     const playerName = playerNameInput.value.trim();
     if (!playerName) {
-      alert("Будь ласка, введіть своє ім'я!");
+      Swal.fire({
+        title: "Забули ім'я",
+        text: "Будь ласка, введіть своє ім'я.",
+        icon: "warning",
+      });
       return;
     }
-    nameInputSection.classList.add("hidden");
-    quizSection.classList.remove("hidden");
+    if (selectedGender === null) {
+      Swal.fire({
+        title: "Забули стать",
+        text: "Будь ласка, оберіть свою стать.",
+        icon: "warning",
+      });
+      return;
+    }
+
+    showSection(quizSection);
 
     const characterData = quizData[selectedCharacter];
     const quizImage = document.createElement("img");
@@ -181,7 +233,6 @@ document.addEventListener("DOMContentLoaded", () => {
     quizImage.alt = `Імперія: ${selectedCharacter}`;
     quizImage.classList.add("quiz-image");
 
-    // Перевіряємо, чи зображення вже існує, щоб уникнути дублювання
     const existingImage = quizContainer.querySelector(".quiz-image");
     if (existingImage) {
       existingImage.remove();
@@ -193,9 +244,18 @@ document.addEventListener("DOMContentLoaded", () => {
     currentQuestionIndex = 0;
     correctAnswersCount = 0;
 
-    missionIntro.innerHTML = missionIntros[selectedCharacter](playerName);
+    missionIntro.innerHTML = missionIntros[selectedCharacter](playerName, selectedGender);
     missionIntro.classList.remove("hidden");
     questionsOverlay.classList.add("hidden");
+
+    const audioFiles = {
+      Єгиптянин: "egypts.mp3",
+      Грек: "greeks.mp3",
+      Римлянин: "romans.mp3",
+      Єврей: "hebrews.mp3",
+    };
+
+    crossfadeMusic(`audio/${audioFiles[selectedCharacter]}`);
 
     const startMissionButton = document.getElementById("start-mission");
     if (startMissionButton) {
@@ -208,67 +268,107 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const handleRetry = () => {
-    // Приховуємо всі секції та повертаємо до hero
-    resultSection.classList.add("hidden");
-    quizSection.classList.add("hidden");
-    nameInputSection.classList.add("hidden");
-    characterSelectionSection.classList.add("hidden");
-    heroSection.style.display = "flex";
+    showSection(characterSelectionSection);
 
-    // Скидаємо стан музики
-    backgroundMusic.pause();
-    backgroundMusic.currentTime = 0;
-    musicButton.classList.add("hidden");
-    musicButton.classList.remove("playing", "paused");
-    musicIcon.classList.remove("fa-volume-mute");
-    musicIcon.classList.add("fa-volume-up");
+    crossfadeMusic("audio/empireQuiz.mp3");
 
-    // Очищаємо стилі теми та контейнер
-    main.className = "";
-
-    // Скидаємо глобальні змінні
-    selectedCharacter = null;
-    correctAnswersCount = 0;
     currentQuestionIndex = 0;
-    totalQuestions = 0;
-    quizQuestions = [];
+    correctAnswersCount = 0;
+    selectedCharacter = null;
+    selectedGender = null;
 
-    // Прибираємо динамічно додані елементи та відновлюємо початкову структуру
+    genderMaleButton.classList.remove("active");
+    genderFemaleButton.classList.remove("active");
+
     const quizImage = quizContainer.querySelector(".quiz-image");
     if (quizImage) {
       quizImage.remove();
     }
+    main.className = "";
+  };
 
-    // Оновлюємо посилання на елементи, так як вони можуть бути перезаписані
-    missionIntro = document.getElementById("mission-intro");
-    questionsOverlay = document.getElementById("questions-overlay");
-    if (missionIntro) missionIntro.innerHTML = "";
-    if (questionsOverlay) questionsOverlay.innerHTML = "";
+  const handleBackToHero = () => {
+    showSection(heroSection);
+
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+    bottomButtonsContainer.classList.remove("show");
+    updateMusicButtonState();
   };
 
   const handleToggleMusic = () => {
-    if (backgroundMusic.paused) {
-      backgroundMusic
-        .play()
-        .then(() => {
-          updateMusicButtonState();
-        })
-        .catch(error => {
-          console.error("Failed to play music:", error);
-        });
+    isMusicOn = !isMusicOn;
+    if (isMusicOn) {
+      backgroundMusic.play();
     } else {
       backgroundMusic.pause();
-      updateMusicButtonState();
     }
+    updateMusicButtonState();
   };
 
-  chooseCharacterButton.addEventListener("click", () => {
-    heroSection.style.display = "none";
-    characterSelectionSection.classList.remove("hidden");
-    setupCharacterSelection();
-  });
-  confirmCharacterButton.addEventListener("click", handleCharacterConfirmation);
-  startGameButton.addEventListener("click", handleStartGame);
-  retryButton.addEventListener("click", handleRetry);
-  musicButton.addEventListener("click", handleToggleMusic);
+  const handleBackToCharacters = () => {
+    showSection(characterSelectionSection);
+  };
+
+  const showSection = sectionToShow => {
+    const allSections = [
+      heroSection,
+      characterSelectionSection,
+      nameInputSection,
+      quizSection,
+      resultSection,
+    ];
+    allSections.forEach(section => {
+      section.classList.add("hidden");
+    });
+    sectionToShow.classList.remove("hidden");
+  };
+
+  if (genderMaleButton) {
+    genderMaleButton.addEventListener("click", () => {
+      selectedGender = "male";
+      genderMaleButton.classList.add("active");
+      if (genderFemaleButton) {
+        genderFemaleButton.classList.remove("active");
+      }
+    });
+  }
+
+  if (genderFemaleButton) {
+    genderFemaleButton.addEventListener("click", () => {
+      selectedGender = "female";
+      genderFemaleButton.classList.add("active");
+      if (genderMaleButton) {
+        genderMaleButton.classList.remove("active");
+      }
+    });
+  }
+
+  if (chooseCharacterButton) {
+    chooseCharacterButton.addEventListener("click", () => {
+      crossfadeMusic("audio/empireQuiz.mp3");
+      bottomButtonsContainer.classList.add("show");
+      showSection(characterSelectionSection);
+      setupCharacterSelection();
+    });
+  }
+
+  if (confirmCharacterButton) {
+    confirmCharacterButton.addEventListener("click", handleCharacterConfirmation);
+  }
+  if (startGameButton) {
+    startGameButton.addEventListener("click", handleStartGame);
+  }
+  if (retryButton) {
+    retryButton.addEventListener("click", handleRetry);
+  }
+  if (toggleMusicButton) {
+    toggleMusicButton.addEventListener("click", handleToggleMusic);
+  }
+  if (backButton) {
+    backButton.addEventListener("click", handleBackToCharacters);
+  }
+  if (backToHeroButton) {
+    backToHeroButton.addEventListener("click", handleBackToHero);
+  }
 });

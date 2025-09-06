@@ -11,6 +11,12 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script
       type="module"
       src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
@@ -41,7 +47,20 @@
       </section>
 
       <section id="name-input" class="hidden">
-        <h2>Введи своє ім'я, мандрівник часу!</h2>
+        <button id="back-to-characters" class="back-button">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Введи своє ім'я та оберіть стать, мандрівник часу!</h2>
+
+        <div class="gender-selection">
+          <button id="gender-male" class="gender-btn">
+            <i class="fas fa-male"></i>
+          </button>
+          <button id="gender-female" class="gender-btn">
+            <i class="fas fa-female"></i>
+          </button>
+        </div>
+
         <input type="text" id="player-name" placeholder="Твоє ім'я" maxlength="20" />
         <button id="start-game">Розпочати гру</button>
       </section>
@@ -65,9 +84,15 @@
       </section>
     </main>
 
-    <button id="toggle-music" class="hidden">
-      <i class="fas fa-volume-up"></i>
-    </button>
+    <div id="bottom-buttons-container">
+      <button id="back-to-hero" class="btn">
+        <i class="fas fa-home"></i>
+      </button>
+      <button id="toggle-music" class="btn">
+        <i class="fas fa-volume-up"></i>
+      </button>
+    </div>
+    <audio id="short-effect"></audio>
     <audio id="background-music" loop></audio>
 
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
