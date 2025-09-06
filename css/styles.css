@@ -736,3 +736,46 @@ main.theme-hebrew #retry {
 main.theme-hebrew #retry:hover {
   background-color: #21618c; /* Темніше блакитний */
 }
+#main-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  display: none; /* Приховуємо за замовчуванням */
+  align-items: center;
+  justify-content: flex-end; /* Вирівнюємо вміст справа */
+  background-color: #222; /* Фон як у хедера */
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#main-footer.show {
+  display: flex;
+}
+
+.footer-buttons-container {
+  display: flex;
+  gap: 15px;
+  padding-right: 25px;
+}
+
+.footer-btn {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s ease;
+}
+
+.footer-btn:hover {
+  background: rgba(0, 0, 0, 0.4);
+}

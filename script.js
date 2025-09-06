@@ -9,8 +9,10 @@ let totalQuestions = 0;
 let quizQuestions = [];
 let selectedGender = null;
 let isMusicOn = true;
+let isEffectsOn = true;
 
 const backgroundMusic = document.getElementById("background-music");
+const shortEffect = document.getElementById("short-effect");
 
 const characterNamesMap = {
   Єгиптянин: "egypt",
@@ -55,24 +57,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const retryButton = document.getElementById("retry");
   const backButton = document.getElementById("back-to-characters");
   const backToHeroButton = document.getElementById("back-to-hero");
+
+  // Кнопки для різних футерів
   const toggleMusicButton = document.getElementById("toggle-music");
+  const toggleEffectsButton = document.getElementById("toggle-effects");
+  const toggleMusicFooterButton = document.getElementById("toggle-music-footer");
+  const toggleEffectsFooterButton = document.getElementById("toggle-effects-footer");
+
   const bottomButtonsContainer = document.getElementById("bottom-buttons-container");
+  const mainFooter = document.getElementById("main-footer");
+
+  // Іконки для обох груп кнопок
   const musicIcon = toggleMusicButton.querySelector("i");
-  const shortEffect = document.getElementById("short-effect");
+  const effectsIcon = toggleEffectsButton.querySelector("i");
+  const musicFooterIcon = toggleMusicFooterButton.querySelector("i");
+  const effectsFooterIcon = toggleEffectsFooterButton.querySelector("i");
 
   const updateMusicButtonState = () => {
     if (isMusicOn) {
       musicIcon.classList.remove("fa-volume-mute");
       musicIcon.classList.add("fa-volume-up");
+      musicFooterIcon.classList.remove("fa-volume-mute");
+      musicFooterIcon.classList.add("fa-volume-up");
     } else {
       musicIcon.classList.remove("fa-volume-up");
       musicIcon.classList.add("fa-volume-mute");
+      musicFooterIcon.classList.remove("fa-volume-up");
+      musicFooterIcon.classList.add("fa-volume-mute");
+    }
+  };
+
+  const updateEffectsButtonState = () => {
+    if (isEffectsOn) {
+      effectsIcon.classList.remove("fa-bell-slash");
+      effectsIcon.classList.add("fa-bell");
+      effectsFooterIcon.classList.remove("fa-bell-slash");
+      effectsFooterIcon.classList.add("fa-bell");
+    } else {
+      effectsIcon.classList.remove("fa-bell");
+      effectsIcon.classList.add("fa-bell-slash");
+      effectsFooterIcon.classList.remove("fa-bell");
+      effectsFooterIcon.classList.add("fa-bell-slash");
     }
   };
 
   const playShortEffect = effectSrc => {
-    shortEffect.src = `audio/${effectSrc}`;
-    shortEffect.play().catch(e => console.error("Failed to play short effect:", e));
+    if (isEffectsOn) {
+      // Зупиняємо попереднє відтворення, якщо воно є.
+      shortEffect.pause();
+      shortEffect.currentTime = 0;
+
+      shortEffect.src = `audio/${effectSrc}`;
+      shortEffect.load();
+
+      // Використовуємо промис, щоб бути впевненими, що play() не буде викликаний до завершення завантаження.
+      shortEffect.play().catch(e => {
+        // Ця помилка може виникати, якщо користувач швидко змінює персонажів.
+        // У цьому випадку її можна ігнорувати, оскільки вона не впливає на роботу.
+        if (e.name !== "AbortError") {
+          console.error("Failed to play short effect:", e);
+        }
+      });
+    }
   };
 
   const missionIntros = {
@@ -179,6 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const handleCharacterConfirmation = () => {
+    playShortEffect(characterEffectsMap[selectedCharacter]);
+
     const activeSlide = document.querySelector(".swiper-slide-active");
     if (!activeSlide) {
       Swal.fire({
@@ -269,7 +317,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const handleRetry = () => {
     showSection(characterSelectionSection);
-
     crossfadeMusic("audio/empireQuiz.mp3");
 
     currentQuestionIndex = 0;
@@ -289,11 +336,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const handleBackToHero = () => {
     showSection(heroSection);
-
     backgroundMusic.pause();
     backgroundMusic.currentTime = 0;
-    bottomButtonsContainer.classList.remove("show");
     updateMusicButtonState();
+    updateEffectsButtonState();
   };
 
   const handleToggleMusic = () => {
@@ -304,6 +350,11 @@ document.addEventListener("DOMContentLoaded", () => {
       backgroundMusic.pause();
     }
     updateMusicButtonState();
+  };
+
+  const handleToggleEffects = () => {
+    isEffectsOn = !isEffectsOn;
+    updateEffectsButtonState();
   };
 
   const handleBackToCharacters = () => {
@@ -322,6 +373,15 @@ document.addEventListener("DOMContentLoaded", () => {
       section.classList.add("hidden");
     });
     sectionToShow.classList.remove("hidden");
+
+    // Оновлена логіка для відображення/приховування футерів
+    if (sectionToShow === heroSection) {
+      mainFooter.classList.add("show");
+      bottomButtonsContainer.classList.remove("show");
+    } else {
+      mainFooter.classList.remove("show");
+      bottomButtonsContainer.classList.add("show");
+    }
   };
 
   if (genderMaleButton) {
@@ -347,7 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (chooseCharacterButton) {
     chooseCharacterButton.addEventListener("click", () => {
       crossfadeMusic("audio/empireQuiz.mp3");
-      bottomButtonsContainer.classList.add("show");
       showSection(characterSelectionSection);
       setupCharacterSelection();
     });
@@ -362,13 +421,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (retryButton) {
     retryButton.addEventListener("click", handleRetry);
   }
+
+  // Прив'язуємо функціонал до обох пар кнопок
   if (toggleMusicButton) {
     toggleMusicButton.addEventListener("click", handleToggleMusic);
   }
+  if (toggleEffectsButton) {
+    toggleEffectsButton.addEventListener("click", handleToggleEffects);
+  }
+  if (toggleMusicFooterButton) {
+    toggleMusicFooterButton.addEventListener("click", handleToggleMusic);
+  }
+  if (toggleEffectsFooterButton) {
+    toggleEffectsFooterButton.addEventListener("click", handleToggleEffects);
+  }
+
   if (backButton) {
     backButton.addEventListener("click", handleBackToCharacters);
   }
   if (backToHeroButton) {
     backToHeroButton.addEventListener("click", handleBackToHero);
   }
+
+  // Додаємо цю ініціалізацію, щоб переконатися, що футер відображається правильно при завантаженні
+  showSection(heroSection);
 });
