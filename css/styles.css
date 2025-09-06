@@ -1,0 +1,636 @@
+/* ========================================= */
+/* 1. Основні та глобальні стилі */
+/* ========================================= */
+
+/* Підключення шрифту Montserrat */
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Підключення жирного стилю Montserrat */
+@font-face {
+  font-family: "Montserrat";
+  src: url("../fonts/Montserrat-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+  color: white;
+  font-size: 1.5rem;
+  position: fixed; /* Фіксуємо хедер */
+  width: 100%; /* Розтягуємо на всю ширину */
+  top: 0; /* Прикріплюємо до верху */
+  left: 0;
+  z-index: 100; /* Перекриває інший контент */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Додаємо тінь для об'єму */
+}
+
+main {
+  padding-top: 40px; /* Відступ зверху, щоб контент не перекривався хедером */
+}
+
+.hidden {
+  display: none !important;
+}
+
+#hero,
+#character-selection,
+#name-input {
+  margin: 2rem;
+  margin-top: 6rem;
+  text-align: center;
+  max-width: 800px;
+  padding: 1rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+/* Секція quiz тепер буде мати адаптивну висоту і не вимагає фіксованої ширини/висоти */
+#quiz {
+  margin: 0; /* Прибираємо зовнішні відступи */
+  padding: 0; /* Прибираємо внутрішні відступи */
+  background-color: transparent; /* Робимо фон прозорим */
+  box-shadow: none; /* Прибираємо тінь */
+  max-width: none; /* Дозволяємо займати всю ширину */
+}
+
+.characters button {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#swiper-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  height: 300px;
+  position: relative;
+  margin-bottom: 1rem;
+  overflow-x: hidden;
+  /* Приховуємо скролбар для різних браузерів */
+  -ms-overflow-style: none; /* IE та Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Приховуємо скролбар для WebKit-браузерів (Chrome, Safari) */
+#swiper-container::-webkit-scrollbar {
+  display: none;
+}
+
+#swiper-container > div {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  margin: 0 1rem;
+  text-align: center;
+}
+
+button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.model-container {
+  width: 100%;
+  height: 75%;
+  position: relative;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.swiper-pagination {
+  display: none;
+}
+
+/* Стилі для кнопок навігації Swiper */
+.swiper-button-next,
+.swiper-button-prev {
+  background-image: none !important; /* Прибираємо стандартний фон */
+  background-color: transparent !important; /* Робимо фон повністю прозорим */
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff; /* Колір іконок */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Тінь для кращої видимості */
+  font-size: 2rem;
+  width: 30px;
+  height: 30px;
+  margin: 0 1rem;
+}
+
+#name-input input {
+  margin-bottom: 1rem;
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 70%;
+  max-width: 300px;
+  font-size: 1rem;
+}
+.question-block {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.quiz-option {
+  display: block;
+  margin: 0.7rem auto;
+  padding: 0.8rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 80%;
+  max-width: 400px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.quiz-option:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.correct {
+  color: green;
+  font-weight: bold;
+}
+
+.incorrect {
+  color: red;
+  font-weight: bold;
+}
+
+#toggle-music {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 2rem;
+  color: #fff;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  display: none;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Клас для анімації пульсації */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#toggle-music.playing {
+  display: block;
+  animation: pulse 1s infinite ease-in-out;
+  color: #4caf50;
+}
+
+#toggle-music.paused {
+  display: block;
+  animation: none;
+  color: #ffc107;
+}
+
+model-viewer {
+  margin: 0;
+  width: 100%;
+  height: 250px;
+  max-height: 500px;
+  margin: 0 auto;
+}
+#hero {
+  margin: 0;
+  text-align: center;
+  background-image: url("../images/hero.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+}
+#hero .hero-content {
+  margin-top: -8rem;
+}
+
+#hero h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+#hero button {
+  font-size: 1rem;
+  padding: 0.8rem 1.6rem;
+}
+
+/* Фіксуємо зображення та позиціонуємо його як фон */
+.quiz-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* Змінено на cover, щоб зображення займало весь фон */
+  z-index: -1;
+}
+
+/* Контейнер для вмісту вікторини (intro та питання) */
+#quiz-container {
+  position: relative; /* Щоб внутрішні елементи могли позиціонуватися відносно нього */
+  width: 100%;
+  min-height: calc(100vh - 80px); /* Займає всю доступну висоту */
+  display: flex; /* Для флексбоксів */
+  flex-direction: column; /* Розташовуємо елементи по вертикалі */
+  justify-content: flex-end; /* Вирівнюємо вміст внизу */
+  align-items: center; /* Центруємо по горизонталі */
+  padding-bottom: 2rem; /* Відступ від нижнього краю */
+}
+
+/* Стилі для початкового екрана місії */
+#mission-intro {
+  padding: 1.5rem; /* Зменшено padding */
+  background-color: rgba(255, 255, 255, 0.8); /* Напівпрозорий білий фон */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 700px; /* Трохи більша максимальна ширина */
+  width: 90%; /* Адаптивна ширина */
+  margin-bottom: 2rem; /* Відступ від низу екрана */
+  text-align: center;
+  animation: fadeIn 1s ease-out;
+}
+
+#mission-intro h2 {
+  font-size: 1.8rem; /* Зменшено розмір шрифту */
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+#mission-intro p {
+  font-size: 1.1rem; /* Зменшено розмір шрифту */
+  line-height: 1.4;
+  color: #555;
+}
+
+#mission-intro button {
+  margin-top: 1rem; /* Зменшено відступ */
+  padding: 0.8rem 1.8rem; /* Зменшено padding */
+  font-size: 1rem;
+}
+
+/* Створюємо контейнер для питань з прозорим фоном */
+#questions-overlay {
+  background-color: rgba(255, 255, 255, 0.8); /* Напівпрозорий білий оверлей */
+  min-height: auto; /* Висота буде адаптивною до вмісту */
+  padding: 1.5rem; /* Зменшено padding */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 700px; /* Трохи більша максимальна ширина */
+  width: 90%; /* Адаптивна ширина */
+  margin-bottom: 2rem; /* Відступ від низу екрана */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.question-block {
+  margin-bottom: 1rem; /* Зменшено відступ */
+  padding: 1rem;
+  border: none; /* Прибираємо рамку, оскільки є фон у overlay */
+  border-radius: 8px;
+  background-color: transparent; /* Робимо фон прозорим */
+  box-shadow: none; /* Прибираємо тінь */
+  width: 100%; /* Займає всю доступну ширину overlay */
+}
+.question-block h3 {
+  font-size: 1.4rem; /* Зменшено розмір шрифту питання */
+  margin-bottom: 1rem;
+}
+.quiz-option {
+  padding: 0.7rem; /* Зменшено padding */
+  font-size: 0.95rem; /* Зменшено розмір шрифту */
+}
+
+/* Анімації для питань */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+.question-block.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.question-block.fade-out {
+  animation: fadeOut 0.5s ease-out forwards;
+}
+
+/* ========================================= */
+/* 2. Стилі для тем */
+/* ========================================= */
+
+/* Єгипетська тема */
+main.theme-egypt #questions-overlay {
+  background-color: rgba(255, 249, 230, 0.8); /* Напівпрозорий піщаний колір */
+}
+main.theme-egypt #mission-intro {
+  background-color: rgba(255, 249, 230, 0.8);
+}
+main.theme-egypt .quiz-option,
+main.theme-egypt #start-game,
+main.theme-egypt #retry,
+main.theme-egypt #start-mission {
+  background-color: #d4ac0d; /* Золотий */
+}
+
+main.theme-egypt .quiz-option:hover,
+main.theme-egypt #start-game:hover,
+main.theme-egypt #retry:hover,
+main.theme-egypt #start-mission:hover {
+  background-color: #b7950b; /* Темніше золото */
+}
+
+main.theme-egypt h3,
+main.theme-egypt h2,
+main.theme-egypt #result-message,
+main.theme-egypt #mission-intro h2,
+main.theme-egypt #mission-intro p {
+  color: #6a0505; /* Темно-червоний */
+}
+
+/* Грецька тема */
+main.theme-greek #questions-overlay {
+  background-color: rgba(240, 244, 247, 0.8); /* Напівпрозорий світло-сірий */
+}
+main.theme-greek #mission-intro {
+  background-color: rgba(240, 244, 247, 0.8);
+}
+main.theme-greek .quiz-option,
+main.theme-greek #start-game,
+main.theme-greek #retry,
+main.theme-greek #start-mission {
+  background-color: #5d6d7e; /* Сіро-синій */
+}
+
+main.theme-greek .quiz-option:hover,
+main.theme-greek #start-game:hover,
+main.theme-greek #retry:hover,
+main.theme-greek #start-mission:hover {
+  background-color: #34495e; /* Темніше сіро-синій */
+}
+
+main.theme-greek h3,
+main.theme-greek h2,
+main.theme-greek #result-message,
+main.theme-greek #mission-intro h2,
+main.theme-greek #mission-intro p {
+  color: #1a5276; /* Синій */
+}
+
+/* Римська тема */
+main.theme-roman #questions-overlay {
+  background-color: rgba(252, 241, 241, 0.8); /* Напівпрозорий світло-рожевий */
+}
+main.theme-roman #mission-intro {
+  background-color: rgba(252, 241, 241, 0.8);
+}
+main.theme-roman .quiz-option,
+main.theme-roman #start-game,
+main.theme-roman #retry,
+main.theme-roman #start-mission {
+  background-color: #c0392b; /* Червоний */
+}
+
+main.theme-roman .quiz-option:hover,
+main.theme-roman #start-game:hover,
+main.theme-roman #retry:hover,
+main.theme-roman #start-mission:hover {
+  background-color: #a93226; /* Темніше червоний */
+}
+
+main.theme-roman h3,
+main.theme-roman h2,
+main.theme-roman #result-message,
+main.theme-roman #mission-intro h2,
+main.theme-roman #mission-intro p {
+  color: #88451b; /* Коричневий */
+}
+
+/* Єврейська тема */
+main.theme-hebrew #questions-overlay {
+  background-color: rgba(230, 240, 255, 0.8); /* Напівпрозорий світло-блакитний */
+}
+main.theme-hebrew #mission-intro {
+  background-color: rgba(230, 240, 255, 0.8);
+}
+main.theme-hebrew .quiz-option,
+main.theme-hebrew #start-game,
+main.theme-hebrew #retry,
+main.theme-hebrew #start-mission {
+  background-color: #2e86c1; /* Блакитний */
+}
+
+main.theme-hebrew .quiz-option:hover,
+main.theme-hebrew #start-game:hover,
+main.theme-hebrew #retry:hover,
+main.theme-hebrew #start-mission:hover {
+  background-color: #21618c; /* Темніше блакитний */
+}
+
+main.theme-hebrew h3,
+main.theme-hebrew h2,
+main.theme-hebrew #result-message,
+main.theme-hebrew #mission-intro h2,
+main.theme-hebrew #mission-intro p {
+  color: #1f618d; /* Темно-синій */
+}
+
+/* Стилі для секції результатів */
+#result {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  padding: 2rem;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+#result-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+#result .top-content,
+#result .bottom-content {
+  width: 100%;
+  text-align: center;
+  z-index: 1;
+}
+
+#result .top-content {
+  margin-top: 2rem;
+}
+
+#result .bottom-content {
+  margin-bottom: 2rem;
+}
+
+#result h2 {
+  font-size: 3rem;
+  color: white; /* Базовий колір для заголовка */
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+#result-message {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  color: white; /* Базовий колір для повідомлення */
+}
+
+#retry {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+}
+
+/* Тепер додамо стилі для тем до елементів результату */
+/* Єгипетська тема */
+main.theme-egypt #result h2 {
+  color: #d4ac0d; /* Золотий для заголовка */
+}
+main.theme-egypt #result-message {
+  color: #f0e68c; /* Світліше золото для повідомлення */
+}
+main.theme-egypt #retry {
+  background-color: #d4ac0d; /* Золота кнопка */
+}
+main.theme-egypt #retry:hover {
+  background-color: #b7950b; /* Темніше золото */
+}
+
+/* Грецька тема */
+main.theme-greek #result h2 {
+  color: #add8e6; /* Світло-блакитний */
+}
+main.theme-greek #result-message {
+  color: #87cefa; /* Небесно-блакитний */
+}
+main.theme-greek #retry {
+  background-color: #5d6d7e; /* Сіро-синя кнопка */
+}
+main.theme-greek #retry:hover {
+  background-color: #34495e; /* Темніше сіро-синій */
+}
+
+/* Римська тема */
+main.theme-roman #result h2 {
+  color: #ff6347; /* Томатно-червоний */
+}
+main.theme-roman #result-message {
+  color: #ffa07a; /* Світло-лососевий */
+}
+main.theme-roman #retry {
+  background-color: #c0392b; /* Червона кнопка */
+}
+main.theme-roman #retry:hover {
+  background-color: #a93226; /* Темніше червоний */
+}
+
+/* Єврейська тема */
+main.theme-hebrew #result h2 {
+  color: #87ceeb; /* Світло-небесно-блакитний */
+}
+main.theme-hebrew #result-message {
+  color: #b0e0e6; /* Поудер-блакитний */
+}
+main.theme-hebrew #retry {
+  background-color: #2e86c1; /* Блакитна кнопка */
+}
+main.theme-hebrew #retry:hover {
+  background-color: #21618c; /* Темніше блакитний */
+}

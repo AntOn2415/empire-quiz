@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Empire Quiz</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="icon" href="images/favicon.ico" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <script
+      type="module"
+      src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+    ></script>
+  </head>
+  <body>
+    <header>
+      <h1>Empire Quiz</h1>
+    </header>
+
+    <main>
+      <section id="hero">
+        <div class="hero-content">
+          <h2>Обери свою імперію</h2>
+          <button id="choose-character">Обрати за кого грати</button>
+        </div>
+      </section>
+
+      <section id="character-selection" class="hidden">
+        <h2>Обери свою цивілізацію</h2>
+        <div class="swiper-container" id="swiper-container">
+          <div class="swiper-wrapper"></div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+        <button id="confirm-character">Підтвердити вибір</button>
+      </section>
+
+      <section id="name-input" class="hidden">
+        <h2>Введи своє ім'я, мандрівник часу!</h2>
+        <input type="text" id="player-name" placeholder="Твоє ім'я" maxlength="20" />
+        <button id="start-game">Розпочати гру</button>
+      </section>
+
+      <section id="quiz" class="hidden">
+        <div id="quiz-container">
+          <div id="mission-intro"></div>
+          <div id="questions-overlay" class="hidden"></div>
+        </div>
+      </section>
+
+      <section id="result" class="hidden">
+        <video id="result-video" autoplay muted></video>
+        <div class="top-content">
+          <h2>Результат</h2>
+        </div>
+        <div class="bottom-content">
+          <p id="result-message"></p>
+          <button id="retry">Спробувати ще</button>
+        </div>
+      </section>
+    </main>
+
+    <button id="toggle-music" class="hidden">
+      <i class="fas fa-volume-up"></i>
+    </button>
+    <audio id="background-music" loop></audio>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
