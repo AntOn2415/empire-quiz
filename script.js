@@ -14,6 +14,18 @@ let isEffectsOn = true;
 const backgroundMusic = document.getElementById("background-music");
 const shortEffect = document.getElementById("short-effect");
 
+// 👇 Новий код для лоудера
+const loaderContainer = document.getElementById("loader");
+
+export const showLoader = () => {
+  loaderContainer.classList.add("visible");
+};
+
+export const hideLoader = () => {
+  loaderContainer.classList.remove("visible");
+};
+// 👆 Кінець нового коду
+
 const characterNamesMap = {
   Єгиптянин: "egypt",
   Грек: "greek",
@@ -68,52 +80,44 @@ document.addEventListener("DOMContentLoaded", () => {
   const mainFooter = document.getElementById("main-footer");
 
   // Іконки для обох груп кнопок
-  const musicIcon = toggleMusicButton.querySelector("i");
-  const effectsIcon = toggleEffectsButton.querySelector("i");
-  const musicFooterIcon = toggleMusicFooterButton.querySelector("i");
-  const effectsFooterIcon = toggleEffectsFooterButton.querySelector("i");
+  // ⚠️ ВИПРАВЛЕННЯ: Доступ до іконок переміщено всередину 'DOMContentLoaded', як було раніше,
+  // але додано перевірку, щоб уникнути помилок, якщо елементи не існують.
+  const musicIcon = toggleMusicButton ? toggleMusicButton.querySelector("i") : null;
+  const effectsIcon = toggleEffectsButton ? toggleEffectsButton.querySelector("i") : null;
+  const musicFooterIcon = toggleMusicFooterButton
+    ? toggleMusicFooterButton.querySelector("i")
+    : null;
+  const effectsFooterIcon = toggleEffectsFooterButton
+    ? toggleEffectsFooterButton.querySelector("i")
+    : null;
 
   const updateMusicButtonState = () => {
     if (isMusicOn) {
-      musicIcon.classList.remove("fa-volume-mute");
-      musicIcon.classList.add("fa-volume-up");
-      musicFooterIcon.classList.remove("fa-volume-mute");
-      musicFooterIcon.classList.add("fa-volume-up");
+      if (musicIcon) musicIcon.classList.replace("fa-volume-mute", "fa-volume-up");
+      if (musicFooterIcon) musicFooterIcon.classList.replace("fa-volume-mute", "fa-volume-up");
     } else {
-      musicIcon.classList.remove("fa-volume-up");
-      musicIcon.classList.add("fa-volume-mute");
-      musicFooterIcon.classList.remove("fa-volume-up");
-      musicFooterIcon.classList.add("fa-volume-mute");
+      if (musicIcon) musicIcon.classList.replace("fa-volume-up", "fa-volume-mute");
+      if (musicFooterIcon) musicFooterIcon.classList.replace("fa-volume-up", "fa-volume-mute");
     }
   };
 
   const updateEffectsButtonState = () => {
     if (isEffectsOn) {
-      effectsIcon.classList.remove("fa-bell-slash");
-      effectsIcon.classList.add("fa-bell");
-      effectsFooterIcon.classList.remove("fa-bell-slash");
-      effectsFooterIcon.classList.add("fa-bell");
+      if (effectsIcon) effectsIcon.classList.replace("fa-bell-slash", "fa-bell");
+      if (effectsFooterIcon) effectsFooterIcon.classList.replace("fa-bell-slash", "fa-bell");
     } else {
-      effectsIcon.classList.remove("fa-bell");
-      effectsIcon.classList.add("fa-bell-slash");
-      effectsFooterIcon.classList.remove("fa-bell");
-      effectsFooterIcon.classList.add("fa-bell-slash");
+      if (effectsIcon) effectsIcon.classList.replace("fa-bell", "fa-bell-slash");
+      if (effectsFooterIcon) effectsFooterIcon.classList.replace("fa-bell", "fa-bell-slash");
     }
   };
 
   const playShortEffect = effectSrc => {
     if (isEffectsOn) {
-      // Зупиняємо попереднє відтворення, якщо воно є.
       shortEffect.pause();
       shortEffect.currentTime = 0;
-
       shortEffect.src = `audio/${effectSrc}`;
       shortEffect.load();
-
-      // Використовуємо промис, щоб бути впевненими, що play() не буде викликаний до завершення завантаження.
       shortEffect.play().catch(e => {
-        // Ця помилка може виникати, якщо користувач швидко змінює персонажів.
-        // У цьому випадку її можна ігнорувати, оскільки вона не впливає на роботу.
         if (e.name !== "AbortError") {
           console.error("Failed to play short effect:", e);
         }
@@ -225,8 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const handleCharacterConfirmation = () => {
-    playShortEffect(characterEffectsMap[selectedCharacter]);
-
     const activeSlide = document.querySelector(".swiper-slide-active");
     if (!activeSlide) {
       Swal.fire({
@@ -237,6 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       return;
     }
+
     selectedCharacter = activeSlide.querySelector("p").textContent;
 
     if (characterEffectsMap[selectedCharacter]) {
@@ -369,12 +372,11 @@ document.addEventListener("DOMContentLoaded", () => {
       quizSection,
       resultSection,
     ];
+    // Забираємо setTimeout звідси, щоб не конфліктувати з лоудером
     allSections.forEach(section => {
       section.classList.add("hidden");
     });
     sectionToShow.classList.remove("hidden");
-
-    // Оновлена логіка для відображення/приховування футерів
     if (sectionToShow === heroSection) {
       mainFooter.classList.add("show");
       bottomButtonsContainer.classList.remove("show");
@@ -422,13 +424,13 @@ document.addEventListener("DOMContentLoaded", () => {
     retryButton.addEventListener("click", handleRetry);
   }
 
-  // Прив'язуємо функціонал до обох пар кнопок
   if (toggleMusicButton) {
     toggleMusicButton.addEventListener("click", handleToggleMusic);
   }
   if (toggleEffectsButton) {
     toggleEffectsButton.addEventListener("click", handleToggleEffects);
   }
+
   if (toggleMusicFooterButton) {
     toggleMusicFooterButton.addEventListener("click", handleToggleMusic);
   }
@@ -443,6 +445,5 @@ document.addEventListener("DOMContentLoaded", () => {
     backToHeroButton.addEventListener("click", handleBackToHero);
   }
 
-  // Додаємо цю ініціалізацію, щоб переконатися, що футер відображається правильно при завантаженні
   showSection(heroSection);
 });
