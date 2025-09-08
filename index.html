@@ -44,6 +44,11 @@
           <div class="swiper-button-prev"></div>
         </div>
         <button id="confirm-character">Підтвердити вибір</button>
+
+        <div id="player-status-container">
+          <p id="player-status-title">Статус поточного гравця</p>
+          <div id="player-avatars-and-stats"></div>
+        </div>
       </section>
 
       <section id="name-input" class="hidden">
@@ -75,7 +80,7 @@
       <section id="result" class="hidden">
         <video id="result-video" autoplay muted></video>
         <div class="top-content">
-          <h2>Результат</h2>
+          <h2 class="visually-hidden">Результат</h2>
         </div>
         <div class="bottom-content">
           <p id="result-message"></p>
@@ -107,7 +112,8 @@
       </div>
     </footer>
 
-    <div id="loader" class="loader-container">
+    <div id="loader" class="loader-container character-selection">
+      <div class="fallback-spinner"></div>
       <lottie-player
         src="assets/Global.json"
         background="transparent"
@@ -120,7 +126,6 @@
     <audio id="short-effect"></audio>
     <audio id="background-music" loop></audio>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script type="module" src="script.js"></script>
   </body>

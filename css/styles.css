@@ -71,11 +71,12 @@ main {
 #hero,
 #character-selection,
 #name-input {
-  margin: 2rem;
+  margin: 1rem;
   margin-top: 6rem;
   text-align: center;
   max-width: 800px;
   padding: 1rem;
+  padding-bottom: 2rem;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -815,21 +816,310 @@ main.theme-hebrew #result .bottom-content {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 1);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  visibility: hidden;
-  opacity: 0;
+  visibility: visible; /* показати одразу */
+  opacity: 1;
   transition: opacity 0.5s ease, visibility 0s 0.5s;
 }
 
-.loader-container.visible {
-  visibility: visible;
-  opacity: 1;
+.loader-container.hidden {
+  opacity: 0;
+  visibility: hidden;
   transition: opacity 0.5s ease;
 }
+
+/* Великий півпрозорий круг */
+.fallback-spinner {
+  width: 200px;
+  height: 200px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Орбіта (слід за супутником) */
+.fallback-spinner::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 2px rgba(255, 255, 255, 0.2); /* додатковий розмитий ефект */
+}
+
+/* Маленька точка-супутник */
+.fallback-spinner::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(-102px);
+  transform-origin: 50% 102px;
+  animation: orbit 3.5s linear infinite;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+}
+
+@keyframes orbit {
+  0% {
+    transform: translate(-50%, -50%) translateY(-102px) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateY(-102px) rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Ховаємо fallback після Lottie завантаження */
+.fallback-hidden {
+  display: none;
+}
+
 .player-name {
   font-weight: bold;
+}
+/* ========================================= */
+/* Стилі для блоку статусу гравця (у вигляді карток) */
+/* ========================================= */
+
+#player-status-container {
+  margin-top: 25px;
+  text-align: center;
+}
+
+#player-status-container p {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#player-avatars-and-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+
+.player-avatar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 70px;
+  flex-shrink: 0;
+}
+
+.avatar-circle {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  margin-bottom: 5px;
+  /* Це буде майбутнім фоном з обличчям */
+  background-size: cover;
+  background-position: center;
+}
+
+.avatar-circle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5); /* Напівпрозорий сірий оверлей */
+  transition: background-color 0.3s ease;
+  z-index: 1; /* Оверлей поверх аватара */
+}
+
+.avatar-circle.colored::before {
+  background-color: transparent; /* Коли активний, робимо оверлей прозорим */
+}
+
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 5px;
+  width: 100%;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 5px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.stats-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stats-value {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.stats-label.win {
+  color: #28a745;
+}
+
+.stats-label.loss {
+  color: #dc3545;
+} /* ========================================= */
+/* Стилі для блоку статусу гравця (у вигляді карток) */
+/* ========================================= */
+
+#player-status-container {
+  margin-top: 25px;
+  text-align: center;
+}
+
+#player-status-container p {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#player-avatars-and-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+}
+
+.player-avatar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 85px;
+  flex-shrink: 0;
+}
+
+.avatar-circle {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  margin-bottom: 5px;
+  /* Це буде майбутнім фоном з обличчям */
+  background-size: cover;
+  background-position: center;
+}
+
+.avatar-circle::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5); /* Напівпрозорий сірий оверлей */
+  transition: background-color 0.3s ease;
+  z-index: 1; /* Оверлей поверх аватара */
+}
+
+.avatar-circle.colored::before {
+  background-color: transparent; /* Коли активний, робимо оверлей прозорим */
+}
+
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 5px;
+  width: 100%;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: 5px;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 2px 0;
+}
+
+.stats-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.stats-value {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.stats-label.win {
+  color: #28a745;
+}
+
+.stats-label.loss {
+  color: #dc3545;
+}
+.stats-label i {
+  font-size: 1rem; /* Розмір іконки */
+}
+
+.stats-label.win i {
+  color: #28a745; /* Колір перемоги */
+}
+
+.stats-label.loss i {
+  color: #dc3545; /* Колір поразки */
+}
+/* ========================================= */
+/* Стилі для картки перемоги */
+/* ========================================= */
+
+.stats-card.victory-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #28a745; /* Зелена рамка для перемоги */
+  background-color: #e2f5e7; /* Світло-зелений фон */
+}
+
+.stats-card.victory-card i {
+  font-size: 2rem; /* Збільшений розмір іконки */
+  color: #28a745;
 }

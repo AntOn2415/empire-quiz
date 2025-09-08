@@ -1,4 +1,4 @@
-import { showLoader, hideLoader } from "../script.js";
+import { showLoader, hideLoader, cacheDynamicFiles } from "../script.js";
 
 let mySwiper = null;
 
@@ -14,40 +14,56 @@ export async function setupCharacterSelection() {
   swiperWrapper.innerHTML = "";
   showLoader();
 
-  const modelLoadPromises = [];
+  // Кешуємо всі 3D-моделі на початку
+  const modelUrls = characters.map(char => char.model);
+  cacheDynamicFiles(modelUrls);
 
-  characters.forEach(character => {
+  const modelLoadPromises = characters.map(character => {
     const slide = document.createElement("div");
     slide.classList.add("swiper-slide");
+
     const modelViewer = document.createElement("model-viewer");
     modelViewer.setAttribute("src", character.model);
+    modelViewer.setAttribute("alt", character.name);
     modelViewer.setAttribute("auto-rotate", "");
     modelViewer.setAttribute("camera-controls", "");
-    modelViewer.setAttribute("alt", character.name);
+    modelViewer.setAttribute("reveal", "auto");
+    modelViewer.setAttribute("loading", "eager");
+    modelViewer.setAttribute("camera-orbit", "0deg 90deg 100%");
+    modelViewer.setAttribute("min-camera-orbit", "auto 30deg auto");
+    modelViewer.setAttribute("max-camera-orbit", "auto 130deg auto");
+
     slide.appendChild(modelViewer);
-    const label = document.createElement("p");
-    label.textContent = character.name;
-    slide.appendChild(label);
+
+    const characterName = document.createElement("p");
+    characterName.textContent = character.name;
+    slide.appendChild(characterName);
+
     swiperWrapper.appendChild(slide);
 
-    const promise = new Promise((resolve, reject) => {
-      const complete = () => {
-        modelViewer.removeEventListener("load", complete);
-        modelViewer.removeEventListener("error", complete);
+    return new Promise((resolve, reject) => {
+      const onLoad = () => {
+        modelViewer.removeEventListener("load", onLoad);
+        modelViewer.removeEventListener("error", onError);
         resolve();
       };
-      modelViewer.addEventListener("load", complete);
-      modelViewer.addEventListener("error", complete);
-      setTimeout(complete, 5000);
+      const onError = () => {
+        modelViewer.removeEventListener("load", onLoad);
+        modelViewer.removeEventListener("error", onError);
+        console.error("Помилка завантаження моделі:", character.model);
+        reject();
+      };
+
+      modelViewer.addEventListener("load", onLoad);
+      modelViewer.addEventListener("error", onError);
     });
-    modelLoadPromises.push(promise);
   });
 
   try {
     await Promise.all(modelLoadPromises);
     hideLoader();
 
-    if (mySwiper !== null) {
+    if (mySwiper) {
       mySwiper.destroy(true, true);
     }
 
@@ -64,16 +80,14 @@ export async function setupCharacterSelection() {
         clickable: true,
       },
       on: {
-        init: function () {
+        init() {
           this.update();
         },
-        slideChangeTransitionEnd: function () {
+        slideChangeTransitionEnd() {
           const activeSlide = this.slides[this.activeIndex];
-
           if (activeSlide && !activeSlide.classList.contains("swiper-slide-duplicate")) {
             const modelViewer = activeSlide.querySelector("model-viewer");
             if (modelViewer) {
-              // 👇 Вмикаємо і вимикаємо camera-controls для скидання стану
               modelViewer.setAttribute("camera-controls", "");
               modelViewer.removeAttribute("camera-controls");
               modelViewer.setAttribute("camera-controls", "");
@@ -83,7 +97,6 @@ export async function setupCharacterSelection() {
       },
     });
   } catch (error) {
-    console.error("Failed to load models or initialize Swiper:", error);
-    hideLoader();
+    console.error("⚠️ Failed to load models or initialize Swiper:", error);
   }
 }
