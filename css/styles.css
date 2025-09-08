@@ -54,6 +54,19 @@ main {
   display: none !important;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
 /* Виправлені стилі для основних секцій */
 #hero,
 #character-selection,
@@ -85,6 +98,7 @@ main {
 
 #swiper-container {
   display: flex;
+  justify-content: center;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   width: 100%;
@@ -278,14 +292,9 @@ button:hover {
   display: flex;
   flex-direction: column-reverse;
   gap: 15px;
-  visibility: hidden; /* Початково прихований */
-  opacity: 0;
-  transition: visibility 0s, opacity 0.5s linear;
-}
-
-#bottom-buttons-container.show {
-  visibility: visible;
+  visibility: visible; /* Початково прихований */
   opacity: 1;
+  transition: visibility 0s, opacity 0.5s linear;
 }
 
 /* Загальні стилі для обох кнопок */
@@ -658,7 +667,14 @@ main.theme-hebrew #mission-intro p {
   margin-top: 2rem;
 }
 
+/* Стилі для напівпрозорої картки повідомлення */
 #result .bottom-content {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  max-width: 700px;
+  width: 90%;
   margin-bottom: 2rem;
 }
 
@@ -669,9 +685,9 @@ main.theme-hebrew #mission-intro p {
 }
 
 #result-message {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin-bottom: 2rem;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
   color: white; /* Базовий колір для повідомлення */
 }
 
@@ -694,6 +710,10 @@ main.theme-egypt #retry {
 main.theme-egypt #retry:hover {
   background-color: #b7950b; /* Темніше золото */
 }
+main.theme-egypt #result .bottom-content {
+  background-color: rgba(255, 249, 230, 0.8);
+  color: #6a0505;
+}
 
 /* Грецька тема */
 main.theme-greek #result h2 {
@@ -707,6 +727,10 @@ main.theme-greek #retry {
 }
 main.theme-greek #retry:hover {
   background-color: #34495e; /* Темніше сіро-синій */
+}
+main.theme-greek #result .bottom-content {
+  background-color: rgba(240, 244, 247, 0.8);
+  color: #1a5276;
 }
 
 /* Римська тема */
@@ -722,6 +746,10 @@ main.theme-roman #retry {
 main.theme-roman #retry:hover {
   background-color: #a93226; /* Темніше червоний */
 }
+main.theme-roman #result .bottom-content {
+  background-color: rgba(252, 241, 241, 0.8);
+  color: #88451b;
+}
 
 /* Єврейська тема */
 main.theme-hebrew #result h2 {
@@ -736,22 +764,23 @@ main.theme-hebrew #retry {
 main.theme-hebrew #retry:hover {
   background-color: #21618c; /* Темніше блакитний */
 }
+main.theme-hebrew #result .bottom-content {
+  background-color: rgba(230, 240, 255, 0.8);
+  color: #1f618d;
+}
+
 #main-footer {
   position: fixed;
+  display: flex;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 80px;
-  display: none; /* Приховуємо за замовчуванням */
   align-items: center;
   justify-content: flex-end; /* Вирівнюємо вміст справа */
   background-color: #222; /* Фон як у хедера */
   z-index: 1000;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
-}
-
-#main-footer.show {
-  display: flex;
 }
 
 .footer-buttons-container {

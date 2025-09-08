@@ -372,17 +372,19 @@ document.addEventListener("DOMContentLoaded", () => {
       quizSection,
       resultSection,
     ];
-    // Забираємо setTimeout звідси, щоб не конфліктувати з лоудером
+
     allSections.forEach(section => {
       section.classList.add("hidden");
     });
     sectionToShow.classList.remove("hidden");
+
+    // 👇 Зміни: коректно перемикаємо видимість обох контейнерів
     if (sectionToShow === heroSection) {
-      mainFooter.classList.add("show");
-      bottomButtonsContainer.classList.remove("show");
+      mainFooter.classList.remove("visually-hidden");
+      bottomButtonsContainer.classList.add("hidden");
     } else {
-      mainFooter.classList.remove("show");
-      bottomButtonsContainer.classList.add("show");
+      mainFooter.classList.add("visually-hidden");
+      bottomButtonsContainer.classList.remove("hidden");
     }
   };
 
