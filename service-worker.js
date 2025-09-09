@@ -1,4 +1,4 @@
-const CACHE_NAME = "empire-quiz-v14-final";
+const CACHE_NAME = "empire-quiz-v14";
 const staticUrlsToCache = [
   "./",
   "./index.html",
