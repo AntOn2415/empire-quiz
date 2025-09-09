@@ -23,11 +23,15 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: Montserrat, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
   color: #333;
+  background-image: url("../images/background.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
 }
 
 header {
@@ -68,9 +72,63 @@ main {
 }
 
 /* Виправлені стилі для основних секцій */
-#hero,
-#character-selection,
-#name-input {
+/* 5. Стилі для секції вибору персонажа */
+/* ========================================= */
+
+#character-selection {
+  position: relative;
+  background-color: rgba(53, 52, 52, 0.5); /* Напівпрозорий фон, щоб вміст був видимий */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 1rem;
+  margin-top: 6rem;
+  text-align: center;
+  max-width: 800px;
+  padding: 1rem;
+  padding-bottom: 2rem;
+  border-radius: 8px;
+  overflow: hidden; /* Обрізаємо відео по кутах контейнера */
+}
+#character-selection h2,
+#character-selection p {
+  color: #fff; /* Робимо весь текст білим */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Додаємо тінь для кращої читабельності */
+  position: relative; /* Щоб з'явився над іншими елементами */
+  z-index: 1; /* Піднімаємо над відео */
+}
+
+/* Додаємо напівпрозорий фон для контейнерів, щоб покращити читабельність */
+#character-selection .swiper-container,
+#character-selection #confirm-character,
+#character-selection #player-status-container {
+  background-color: rgba(255, 255, 255, 0.15); /* Дуже легкий білий фон */
+  backdrop-filter: blur(1px); /* Додаємо ефект розмиття фону за контейнером */
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+#character-selection #confirm-character {
+  background-color: rgba(0, 123, 255, 0.7); /* Робимо кнопку напівпрозорою */
+  color: #fff; /* Білий текст на кнопці */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#character-selection #confirm-character:hover {
+  background-color: rgba(0, 86, 179, 0.8); /* Темніший колір при наведенні */
+}
+
+#background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Розтягує відео на всю площу */
+  z-index: -1; /* Відправляє відео на задній план */
+}
+
+/* Окремі стилі для інших секцій */
+#hero {
   margin: 1rem;
   margin-top: 6rem;
   text-align: center;
@@ -81,6 +139,20 @@ main {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+#name-input {
+  margin: 1rem;
+  margin-top: 6rem;
+  padding: 1rem;
+  padding-top: 3rem;
+  text-align: center;
+  max-width: 800px;
+  padding-bottom: 2rem;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 /* Секція quiz тепер буде мати адаптивну висоту і не вимагає фіксованої ширини/висоти */
 #quiz {
   margin: 0; /* Прибираємо зовнішні відступи */
@@ -196,9 +268,33 @@ button:hover {
   background: rgba(0, 0, 0, 0.4);
 }
 
-.gender-btn.active {
-  background-color: #007bff; /* Колір при виборі */
-  border-color: #007bff;
+/* Єгипетська тема */
+main.theme-egypt .gender-btn.active {
+  background-color: #d4ac0d; /* Золотий */
+  border-color: #d4ac0d;
+}
+
+/* Грецька тема */
+main.theme-greek .gender-btn.active {
+  background-color: #5d6d7e; /* Сіро-синій */
+  border-color: #5d6d7e;
+}
+
+/* Римська тема */
+main.theme-roman .gender-btn.active {
+  background-color: #c0392b; /* Червоний */
+  border-color: #c0392b;
+}
+
+/* Єврейська тема */
+main.theme-hebrew .gender-btn.active {
+  background-color: #2e86c1; /* Блакитний */
+  border-color: #2e86c1;
+}
+
+/* Загальні стилі для hovered-стану кнопок статі */
+.gender-btn:hover {
+  background: rgba(0, 0, 0, 0.4);
 }
 
 #name-input input {
@@ -282,23 +378,65 @@ button:hover {
 }
 
 /* ========================================= */
-/* СТИЛІ для кнопок внизу екрана */
+/* Стилі для кнопки налаштувань та її обгортки */
 /* ========================================= */
-#bottom-buttons-container {
+
+#utility-buttons-wrapper {
   position: fixed;
-  bottom: 25px;
-  right: -10px;
-  transform: translateX(-50%);
-  z-index: 1000;
+  bottom: 25px; /* Залишаємо відступ від низу */
+  right: 25px; /* Залишаємо відступ справа */
   display: flex;
-  flex-direction: column-reverse;
-  gap: 15px;
-  visibility: visible; /* Початково прихований */
-  opacity: 1;
-  transition: visibility 0s, opacity 0.5s linear;
+  flex-direction: column-reverse; /* Щоб кнопки з'являлись зверху від кнопки налаштувань */
+  align-items: flex-end; /* Вирівнювання по правому краю */
+  gap: 15px; /* Проміжок між кнопками */
+  z-index: 1000;
 }
 
-/* Загальні стилі для обох кнопок */
+#bottom-buttons-container {
+  display: flex;
+  flex-direction: column-reverse; /* Кнопки знизу вгору */
+  gap: 15px;
+  /* Стилі для анімації появи/зникнення */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px); /* Початкове зміщення для анімації */
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+/* Коли utility-buttons-wrapper має клас visible-wrapper, кнопки стають видимими */
+#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0); /* Повертаємо на початкове місце */
+}
+
+/* Сама кнопка налаштувань */
+#settings-button {
+  background: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для видимості */
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s ease, transform 0.3s ease; /* Додаємо transform для анімації */
+}
+
+#settings-button:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Анімація повороту кнопки налаштувань */
+#settings-button.is-active {
+  transform: rotate(135deg); /* Поворот на 135 градусів при активності */
+}
+
+/* Загальні стилі для кнопок всередині bottom-buttons-container */
 #bottom-buttons-container .btn {
   background: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для видимості */
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -317,6 +455,23 @@ button:hover {
 
 #bottom-buttons-container .btn:hover {
   background: rgba(0, 0, 0, 0.4);
+}
+
+/* Класи для приховування */
+.hidden {
+  display: none !important;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }
 
 /* Стилі для іконок всередині кнопок */
@@ -773,12 +928,12 @@ main.theme-hebrew #result .bottom-content {
 #main-footer {
   position: fixed;
   display: flex;
+  justify-content: space-between;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 80px;
   align-items: center;
-  justify-content: flex-end; /* Вирівнюємо вміст справа */
   background-color: #222; /* Фон як у хедера */
   z-index: 1000;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
@@ -988,6 +1143,7 @@ main.theme-hebrew #result .bottom-content {
 
 .stats-value {
   font-size: 0.9rem;
+  color: #585858;
   font-weight: bold;
 }
 
@@ -997,13 +1153,16 @@ main.theme-hebrew #result .bottom-content {
 
 .stats-label.loss {
   color: #dc3545;
-} /* ========================================= */
+}
+
+/* ========================================= */
 /* Стилі для блоку статусу гравця (у вигляді карток) */
 /* ========================================= */
 
 #player-status-container {
   margin-top: 25px;
   text-align: center;
+  padding: 0.1rem 0 1rem 0;
 }
 
 #player-status-container p {
@@ -1030,8 +1189,8 @@ main.theme-hebrew #result .bottom-content {
 
 .avatar-circle {
   position: relative;
-  width: 45px;
-  height: 45px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 2px solid transparent;
   margin-bottom: 5px;
@@ -1066,7 +1225,8 @@ main.theme-hebrew #result .bottom-content {
   padding: 5px;
   width: 100%;
   min-height: 55px;
-  background-color: #f9f9f9;
+  background-color: rgba(248, 244, 244, 0.476); /* Дуже легкий білий фон */
+  backdrop-filter: blur(2px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   margin-top: 5px;
 }
@@ -1117,10 +1277,16 @@ main.theme-hebrew #result .bottom-content {
   justify-content: center;
   align-items: center;
   border: 1px solid #28a745; /* Зелена рамка для перемоги */
-  background-color: #e2f5e7; /* Світло-зелений фон */
+  background-color: rgba(248, 244, 244, 0.476); /* Дуже легкий білий фон */
+  backdrop-filter: blur(2px); /* Світло-зелений фон */
 }
 
 .stats-card.victory-card i {
   font-size: 2rem; /* Збільшений розмір іконки */
   color: #28a745;
+}
+.copyright-text {
+  margin: 0 15px;
+  font-size: 0.8rem;
+  color: #aaa;
 }

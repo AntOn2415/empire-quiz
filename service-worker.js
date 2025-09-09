@@ -11,6 +11,8 @@ const staticUrlsToCache = [
   "./fonts/Montserrat-Regular.ttf",
   "./fonts/Montserrat-Bold.ttf",
   "./assets/Global.json",
+  "./videos/clip.mp4",
+  "./images/background.jpg",
 ];
 
 self.addEventListener("install", event => {

@@ -2,18 +2,19 @@ import { setupCharacterSelection } from "./scripts/character-selection.js";
 import { quizData } from "./scripts/quiz.js";
 import { showResult } from "./scripts/result.js";
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then(registration => {
-        console.log("Service Worker зареєстровано успішно:", registration.scope);
-      })
-      .catch(error => {
-        console.log("Помилка реєстрації Service Worker:", error);
-      });
-  });
-}
+// Нагадування: якщо вносиш зміни в код, закоментуй цей блок, щоб уникнути кешування.
+// if ("serviceWorker" in navigator) {
+//   window.addEventListener("load", () => {
+//     navigator.serviceWorker
+//       .register("/service-worker.js")
+//       .then(registration => {
+//         console.log("Service Worker зареєстровано успішно:", registration.scope);
+//       })
+//       .catch(error => {
+//         console.log("Помилка реєстрації Service Worker:", error);
+//       });
+//   });
+// }
 
 let selectedCharacter = null;
 let correctAnswersCount = 0;
@@ -128,7 +129,13 @@ const crossfadeMusic = newSrc => {
 };
 
 // Функція для оновлення статусу гравця на екрані вибору персонажа
-// Функція для оновлення статусу гравця на екрані вибору персонажа
+const characterAvatarsMap = {
+  Єгиптянин: "egypt.png",
+  Грек: "greek.png",
+  Римлянин: "roman.png",
+  Єврей: "hebrew.png",
+};
+
 const renderPlayerStatus = () => {
   const playerStatusTitle = document.getElementById("player-status-title");
   const playerAvatarsContainer = document.getElementById("player-avatars-and-stats");
@@ -144,12 +151,11 @@ const renderPlayerStatus = () => {
   const playerStats = statsJSON ? JSON.parse(statsJSON) : {};
   const currentPlayerStats = playerName ? playerStats[playerName] : null;
 
-  // Масив для коротких назв
   const characters = [
     { name: "Єгиптянин", label: "Єгипет" },
     { name: "Грек", label: "Греція" },
     { name: "Римлянин", label: "Рим" },
-    { name: "Єврей", label: "Іудея" },
+    { name: "Єврей", label: "Юдея" },
   ];
 
   playerAvatarsContainer.innerHTML = "";
@@ -158,14 +164,16 @@ const renderPlayerStatus = () => {
     const gamesWon = currentPlayerStats?.[char.name]?.gamesWon || 0;
     const gamesLost = currentPlayerStats?.[char.name]?.gamesLost || 0;
     const isActive = gamesWon > 0 || gamesLost > 0;
-    const avatarColor = characterColorsMap[char.name];
 
     const avatarItem = document.createElement("div");
     avatarItem.classList.add("player-avatar-item");
 
     const avatarCircle = document.createElement("div");
     avatarCircle.classList.add("avatar-circle");
-    avatarCircle.style.backgroundColor = avatarColor;
+
+    const avatarImagePath = `images/avatars/${characterAvatarsMap[char.name]}`;
+    avatarCircle.style.backgroundImage = `url('${avatarImagePath}')`;
+
     if (isActive) {
       avatarCircle.classList.add("colored");
     }
@@ -173,17 +181,21 @@ const renderPlayerStatus = () => {
     const characterName = document.createElement("p");
     characterName.textContent = char.label;
 
+    if (!isActive) {
+      characterName.style.color = "gray";
+    } else {
+      characterName.style.color = "#fff";
+    }
+
     avatarItem.appendChild(avatarCircle);
     avatarItem.appendChild(characterName);
 
-    // Додаємо умовний рендеринг: якщо є хоча б одна перемога, показуємо кубок
     if (gamesWon > 0) {
       const victoryCard = document.createElement("div");
       victoryCard.classList.add("stats-card", "victory-card");
-      victoryCard.innerHTML = `<i class="fas fa-medal"></i>`; // Використовуємо іконку медалі для перемоги
+      victoryCard.innerHTML = `<i class="fas fa-medal"></i>`;
       avatarItem.appendChild(victoryCard);
     } else if (isActive) {
-      // Якщо перемог немає, але є зіграні ігри, показуємо статистику
       const statsCard = document.createElement("div");
       statsCard.classList.add("stats-card");
 
@@ -233,6 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const bottomButtonsContainer = document.getElementById("bottom-buttons-container");
   const mainFooter = document.getElementById("main-footer");
 
+  const settingsButton = document.getElementById("settings-button");
+  const utilityButtonsWrapper = document.getElementById("utility-buttons-wrapper");
+
   const musicIcon = toggleMusicButton?.querySelector("i");
   const effectsIcon = toggleEffectsButton?.querySelector("i");
   const musicFooterIcon = toggleMusicFooterButton?.querySelector("i");
@@ -270,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Вступні тексти місії
   const missionIntros = {
     Єгиптянин: (playerName, gender) => `
       <h2>Ласкаво просимо, ${playerName}, у Вічну Долину Нілу!</h2>
@@ -373,34 +387,64 @@ document.addEventListener("DOMContentLoaded", () => {
       s => s.classList.add("hidden")
     );
     section.classList.remove("hidden");
+
+    // Нова логіка для відображення/приховування кнопок
     if (section === heroSection) {
-      mainFooter.classList.remove("visually-hidden");
-      bottomButtonsContainer.classList.add("hidden");
+      mainFooter?.classList.remove("visually-hidden");
+      utilityButtonsWrapper?.classList.add("hidden");
     } else {
-      mainFooter.classList.add("visually-hidden");
-      bottomButtonsContainer.classList.remove("hidden");
+      mainFooter?.classList.add("visually-hidden");
+      utilityButtonsWrapper?.classList.remove("hidden");
     }
   };
 
-  // Обробники кнопок, старт гри, вибір персонажа, гендеру, лоудер для картинки та аудіо
+  // Функція для запуску музики залежно від поточної локації
+  const playMusicForCurrentSection = () => {
+    if (isMusicOn) {
+      if (!characterSelectionSection.classList.contains("hidden")) {
+        crossfadeMusic("audio/empireQuiz.mp3");
+      } else if (!quizSection.classList.contains("hidden")) {
+        const audioSrc = `audio/${
+          selectedCharacter === "Єгиптянин"
+            ? "egypts.mp3"
+            : selectedCharacter === "Грек"
+            ? "greeks.mp3"
+            : selectedCharacter === "Римлянин"
+            ? "romans.mp3"
+            : "hebrews.mp3"
+        }`;
+        crossfadeMusic(audioSrc);
+      }
+    }
+  };
+
+  const savedGender = localStorage.getItem("playerGender");
+  if (savedGender) {
+    selectedGender = savedGender;
+  }
+
+  // Визначаємо початковий активний стан кнопок
+  if (selectedGender === "male") {
+    genderMaleButton?.classList.add("active");
+  } else if (savedGender === "female") {
+    genderFemaleButton?.classList.add("active");
+  }
+
   genderMaleButton?.addEventListener("click", () => {
     selectedGender = "male";
     genderMaleButton.classList.add("active");
     genderFemaleButton?.classList.remove("active");
-    localStorage.setItem("playerGender", "male");
   });
   genderFemaleButton?.addEventListener("click", () => {
     selectedGender = "female";
     genderFemaleButton.classList.add("active");
     genderMaleButton?.classList.remove("active");
-    localStorage.setItem("playerGender", "female");
   });
 
   chooseCharacterButton?.addEventListener("click", () => {
-    crossfadeMusic("audio/empireQuiz.mp3");
     showSection(characterSelectionSection);
+    playMusicForCurrentSection();
     setupCharacterSelection();
-    // Оновлюємо статус гравця при переході на екран вибору персонажа
     renderPlayerStatus();
   });
 
@@ -418,7 +462,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     showSection(nameInputSection);
 
-    selectedGender = localStorage.getItem("playerGender");
+    const savedGender = localStorage.getItem("playerGender");
+    if (savedGender) {
+      selectedGender = savedGender;
+    }
+
     genderMaleButton.classList.remove("active");
     genderFemaleButton.classList.remove("active");
     if (selectedGender === "male") {
@@ -431,16 +479,15 @@ document.addEventListener("DOMContentLoaded", () => {
     main.classList.add(`theme-${characterNamesMap[selectedCharacter]}`);
   });
 
-  let isInputFocused = false; // Змінна для відстеження, чи поле отримало фокус
+  let isInputFocused = false;
 
   playerNameInput?.addEventListener("focus", () => {
     if (!isInputFocused && playerNameInput.value) {
-      playerNameInput.value = ""; // Очищаємо поле
+      playerNameInput.value = "";
       isInputFocused = true;
     }
   });
 
-  // Додаємо обробник, щоб скинути прапорець, коли поле втрачає фокус
   playerNameInput?.addEventListener("blur", () => {
     isInputFocused = false;
   });
@@ -457,7 +504,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const statsJSON = localStorage.getItem("player-stats");
     const playerStats = statsJSON ? JSON.parse(statsJSON) : {};
 
-    // Перевіряємо, чи ім'я було змінено вручну І чи воно існує в статистиці
     if (playerName !== lastPlayerName && playerStats[playerName]) {
       const result = await Swal.fire({
         title: "Це ім'я вже існує!",
@@ -472,22 +518,19 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (result.isConfirmed) {
-        // Якщо гравець вибрав "Продовжити", запускаємо гру
         startGame(playerName);
       } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // Якщо гравець вибрав "Обрати інше ім'я", очищаємо поле вводу і повертаємось
         playerNameInput.value = "";
         return;
       }
     } else {
-      // Якщо ім'я нове, або не було змінене, запускаємо гру одразу
       startGame(playerName);
     }
   });
 
-  // Нова функція для запуску гри, щоб уникнути дублювання коду
   const startGame = async playerName => {
     localStorage.setItem("current-player-name", playerName);
+    localStorage.setItem("playerGender", selectedGender);
 
     showSection(quizSection);
     showLoader();
@@ -547,7 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   retryButton?.addEventListener("click", () => {
     showSection(characterSelectionSection);
-    crossfadeMusic("audio/empireQuiz.mp3");
+    playMusicForCurrentSection();
     currentQuestionIndex = 0;
     correctAnswersCount = 0;
     selectedCharacter = null;
@@ -556,7 +599,6 @@ document.addEventListener("DOMContentLoaded", () => {
     genderFemaleButton.classList.remove("active");
     quizContainer.querySelector(".quiz-image")?.remove();
     main.className = "";
-    // Оновлюємо статус гравця при переході на екран вибору персонажа
     renderPlayerStatus();
   });
 
@@ -568,25 +610,47 @@ document.addEventListener("DOMContentLoaded", () => {
     updateEffectsButtonState();
   });
 
+  // Обробники для кнопок в bottom-buttons-container
   toggleMusicButton?.addEventListener("click", () => {
     isMusicOn = !isMusicOn;
-    isMusicOn ? backgroundMusic.play() : backgroundMusic.pause();
+    if (isMusicOn) {
+      playMusicForCurrentSection();
+    } else {
+      backgroundMusic.pause();
+    }
     updateMusicButtonState();
   });
   toggleEffectsButton?.addEventListener("click", () => {
     isEffectsOn = !isEffectsOn;
     updateEffectsButtonState();
   });
+  backButton?.addEventListener("click", () => {
+    showSection(characterSelectionSection);
+    playMusicForCurrentSection();
+  });
+
+  // Обробник для кнопки налаштувань
+  if (settingsButton && utilityButtonsWrapper) {
+    settingsButton.addEventListener("click", () => {
+      utilityButtonsWrapper.classList.toggle("visible-wrapper");
+      settingsButton.classList.toggle("is-active");
+    });
+  }
+
+  // Обробники для кнопок у футері
   toggleMusicFooterButton?.addEventListener("click", () => {
     isMusicOn = !isMusicOn;
-    isMusicOn ? backgroundMusic.play() : backgroundMusic.pause();
+    if (isMusicOn) {
+      playMusicForCurrentSection();
+    } else {
+      backgroundMusic.pause();
+    }
     updateMusicButtonState();
   });
   toggleEffectsFooterButton?.addEventListener("click", () => {
     isEffectsOn = !isEffectsOn;
     updateEffectsButtonState();
   });
-  backButton?.addEventListener("click", () => showSection(characterSelectionSection));
 
   showSection(heroSection);
 });

@@ -36,6 +36,9 @@
       </section>
 
       <section id="character-selection" class="hidden">
+        <video id="background-video" autoplay loop muted playsinline>
+          <source src="videos/clip.mp4" type="video/mp4" />
+        </video>
         <h2>Обери свою цивілізацію</h2>
         <div class="swiper-container" id="swiper-container">
           <div class="swiper-wrapper"></div>
@@ -89,19 +92,26 @@
       </section>
     </main>
 
-    <div id="bottom-buttons-container">
-      <button id="back-to-hero" class="btn">
-        <i class="fas fa-home"></i>
-      </button>
-      <button id="toggle-effects" class="btn">
-        <i class="fas fa-bell"></i>
-      </button>
-      <button id="toggle-music" class="btn">
-        <i class="fas fa-volume-up"></i>
-      </button>
+    <div id="utility-buttons-wrapper">
+  <button id="settings-button" class="btn">
+    <i class="fas fa-cog"></i>
+  </button>
+  <div id="bottom-buttons-container">
+    <button id="back-to-hero" class="btn">
+      <i class="fas fa-home"></i>
+    </button>
+    <button id="toggle-effects" class="btn">
+      <i class="fas fa-bell"></i>
+    </button>
+    <button id="toggle-music" class="btn">
+      <i class="fas fa-volume-up"></i>
+    </button>
+  </div>
+</div>
     </div>
 
     <footer id="main-footer">
+      <p class="copyright-text">© Empire Quiz 2025</p>
       <div class="footer-buttons-container">
         <button id="toggle-music-footer" class="footer-btn">
           <i class="fas fa-volume-up"></i>
