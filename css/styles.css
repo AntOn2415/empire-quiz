@@ -148,7 +148,8 @@ main {
   text-align: center;
   max-width: 800px;
   padding-bottom: 2rem;
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(3px);
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -1289,4 +1290,160 @@ main.theme-hebrew #result .bottom-content {
   margin: 0 15px;
   font-size: 0.8rem;
   color: #aaa;
+}
+
+/* ========================================= */
+/* 9. Стилі для секції статистики гравців */
+/* ========================================= */
+
+#player-stats-section {
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-top: 20px;
+  text-align: center;
+}
+
+#player-stats-section h2 {
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+#player-stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  position: relative;
+}
+
+.player-card:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.player-card .rank {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  width: 25px;
+  text-align: center;
+}
+
+.player-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
+  position: relative;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  overflow: hidden; /* Щоб іконки не виходили за межі */
+}
+
+.player-avatar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--avatar-bg-color, #3498db);
+  opacity: 0.8;
+  z-index: 1;
+}
+
+.player-avatar span {
+  position: relative;
+  z-index: 2;
+}
+
+.player-info {
+  flex-grow: 1;
+  text-align: left;
+  color: white;
+}
+
+.player-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.player-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.player-info .wins {
+  color: #28a745;
+  font-weight: bold;
+}
+.player-info .losses {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.player-info.leader h3 {
+  font-size: 1.3rem;
+}
+
+.player-info.leader p {
+  font-size: 1rem;
+}
+
+.leader-medal {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2rem;
+  color: gold;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.leader-medal.silver {
+  color: silver;
+}
+
+.leader-medal.bronze {
+  color: #cd7f32;
+}
+
+#clear-stats-btn {
+  margin-top: 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#clear-stats-btn:hover {
+  background-color: #c82333;
 }

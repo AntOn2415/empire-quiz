@@ -16,6 +16,14 @@ import { showResult } from "./scripts/result.js";
 //   });
 // }
 
+// Функція для перемішування масиву (алгоритм Фішера-Єйтса)
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 let selectedCharacter = null;
 let correctAnswersCount = 0;
 let currentQuestionIndex = 0;
@@ -214,11 +222,120 @@ const renderPlayerStatus = () => {
     playerAvatarsContainer.appendChild(avatarItem);
   });
 };
+const playerStatsSection = document.getElementById("player-stats-section");
+const playerStatsContainer = document.getElementById("player-stats-container");
+// Генерує випадковий колір для аватара
+const getRandomColor = () => {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
 
+// Оновлює відображення статистики гравців
+export const updatePlayerStatsDisplay = () => {
+  try {
+    const statsJSON = localStorage.getItem("player-stats");
+    const playerStats = statsJSON ? JSON.parse(statsJSON) : {};
+
+    const players = Object.keys(playerStats).map(name => {
+      const games = playerStats[name];
+      let totalWins = 0;
+      let totalLosses = 0;
+
+      // Підраховуємо загальну кількість перемог та поразок по всіх персонажах
+      for (const character in games) {
+        totalWins += games[character].gamesWon;
+        totalLosses += games[character].gamesLost;
+      }
+
+      const totalGames = totalWins + totalLosses;
+      const winRatio = totalGames > 0 ? totalWins / totalGames : 0;
+
+      return {
+        name,
+        totalWins,
+        totalLosses,
+        totalGames,
+        winRatio,
+      };
+    });
+
+    // Сортуємо гравців: спочатку за winRatio (спадання), потім за кількістю ігор (зростання), потім за кількістю перемог (спадання)
+    players.sort((a, b) => {
+      if (b.winRatio !== a.winRatio) {
+        return b.winRatio - a.winRatio; // Сортуємо за коефіцієнтом перемог
+      }
+      if (b.totalGames !== a.totalGames) {
+        return b.totalGames - a.totalGames; // За кількістю ігор
+      }
+      return b.totalWins - a.totalWins; // За кількістю перемог
+    });
+
+    playerStatsContainer.innerHTML = "";
+    if (players.length > 1) {
+      playerStatsSection.classList.remove("hidden");
+      players.forEach((player, index) => {
+        const card = document.createElement("div");
+        card.classList.add("player-card");
+
+        const rankElement = document.createElement("div");
+        rankElement.classList.add("rank");
+        rankElement.textContent = `#${index + 1}`;
+
+        const avatar = document.createElement("div");
+        avatar.classList.add("player-avatar");
+        avatar.style.setProperty("--avatar-bg-color", getRandomColor());
+        const firstLetter = player.name.charAt(0).toUpperCase();
+        avatar.innerHTML = `<span>${firstLetter}</span>`;
+
+        // Додаємо медальки для перших трьох лідерів
+        let medalHtml = "";
+        if (index === 0 && player.totalGames > 0) {
+          medalHtml = `<i class="fas fa-medal leader-medal"></i>`;
+        } else if (index === 1 && player.totalGames > 0) {
+          medalHtml = `<i class="fas fa-award leader-medal silver"></i>`;
+        } else if (index === 2 && player.totalGames > 0) {
+          medalHtml = `<i class="fas fa-trophy leader-medal bronze"></i>`;
+        }
+        if (medalHtml) {
+          const medalContainer = document.createElement("div");
+          medalContainer.innerHTML = medalHtml;
+          avatar.appendChild(medalContainer.firstChild);
+        }
+
+        const info = document.createElement("div");
+        info.classList.add("player-info");
+        if (index < 3) {
+          info.classList.add("leader");
+        }
+
+        info.innerHTML = `
+          <h3>${player.name}</h3>
+          <p>Перемог: <span class="wins">${player.totalWins}</span> | Поразок: <span class="losses">${player.totalLosses}</span></p>
+        `;
+
+        card.appendChild(rankElement);
+        card.appendChild(avatar);
+        card.appendChild(info);
+
+        playerStatsContainer.appendChild(card);
+      });
+    } else {
+      playerStatsSection.classList.add("hidden");
+    }
+  } catch (e) {
+    console.error("Помилка при зчитуванні статистики з localStorage:", e);
+  }
+};
 document.addEventListener("DOMContentLoaded", () => {
   const heroSection = document.getElementById("hero");
   const characterSelectionSection = document.getElementById("character-selection");
   const nameInputSection = document.getElementById("name-input");
+  const clearStatsButton = document.getElementById("clear-stats-btn");
+
   const quizSection = document.getElementById("quiz");
   const resultSection = document.getElementById("result");
   const playerNameInput = document.getElementById("player-name");
@@ -285,6 +402,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // Додати обробник для кнопки "Очистити зал"
+  clearStatsButton?.addEventListener("click", () => {
+    Swal.fire({
+      title: "Ви впевнені?",
+      text: "Ці дії безповоротньо видалять усю статистику гравців!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Так, очистити!",
+      cancelButtonText: "Відміна",
+    }).then(result => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("player-stats");
+        updatePlayerStatsDisplay(); // Оновлюємо відображення
+        Swal.fire("Очищено!", "Усі дані про гравців були видалені.", "success");
+      }
+    });
+  });
+
   const missionIntros = {
     Єгиптянин: (playerName, gender) => `
       <h2>Ласкаво просимо, ${playerName}, у Вічну Долину Нілу!</h2>
@@ -335,14 +472,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const questionText = document.createElement("h3");
       questionText.textContent = `${index + 1}. ${questionData.question}`;
       questionBlock.appendChild(questionText);
-      questionData.options.forEach((option, i) => {
+
+      // Зберігаємо початковий індекс правильної відповіді
+      const originalCorrectIndex = questionData.correct;
+
+      // Створюємо новий масив з варіантами та їхніми початковими індексами
+      const optionsWithOriginalIndex = questionData.options.map((option, i) => ({
+        option,
+        originalIndex: i,
+      }));
+
+      // Перемішуємо масив варіантів
+      const shuffledOptions = shuffleArray(optionsWithOriginalIndex);
+
+      shuffledOptions.forEach(item => {
         const btn = document.createElement("button");
         btn.classList.add("quiz-option");
-        btn.textContent = option;
-        btn.dataset.correct = i === questionData.correct;
+        btn.textContent = item.option;
+        // Встановлюємо dataset.correct на основі оригінального індексу
+        btn.dataset.correct = item.originalIndex === originalCorrectIndex;
         btn.addEventListener("click", handleAnswerClick);
         questionBlock.appendChild(btn);
       });
+
       questionsOverlay.appendChild(questionBlock);
     } else {
       showSection(resultSection);
@@ -383,12 +535,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Показ/приховування секцій
   const showSection = section => {
+    // Приховуємо всі основні секції
     [heroSection, characterSelectionSection, nameInputSection, quizSection, resultSection].forEach(
       s => s.classList.add("hidden")
     );
+
+    // Приховуємо "Зал Слави" за замовчуванням
+    playerStatsSection.classList.add("hidden");
+
+    // Показуємо вибрану секцію
     section.classList.remove("hidden");
 
-    // Нова логіка для відображення/приховування кнопок
+    // Показуємо "Зал Слави" тільки на сторінці введення імені
+    if (section === nameInputSection) {
+      updatePlayerStatsDisplay();
+    }
+
+    // Логіка для кнопок
     if (section === heroSection) {
       mainFooter?.classList.remove("visually-hidden");
       utilityButtonsWrapper?.classList.add("hidden");
@@ -653,4 +816,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   showSection(heroSection);
+  // Приховуємо Зал Слави, щоб він не відображався на головній сторінці
+  playerStatsSection.classList.add("hidden");
 });

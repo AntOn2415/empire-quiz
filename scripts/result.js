@@ -1,4 +1,4 @@
-import { showLoader, hideLoader, cacheDynamicFiles } from "../script.js";
+import { showLoader, hideLoader, cacheDynamicFiles, updatePlayerStatsDisplay } from "../script.js";
 
 // Функція для оновлення статистики у localStorage
 const updatePlayerStats = (playerName, character, isWin) => {
@@ -53,6 +53,7 @@ export const showResult = async (
 
   // Оновлюємо статистику гравця
   updatePlayerStats(playerName, selectedCharacter, isWin);
+  updatePlayerStatsDisplay();
 
   // Визначаємо, чи це перша перемога/поразка для цього гравця та персонажа
   let isFirstResult;
