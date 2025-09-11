@@ -1,3 +1,4 @@
+//scripts/quiz.js
 export const quizData = {
   Єгиптянин: {
     image: "images/egypts.jpg",

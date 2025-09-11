@@ -1,4 +1,6 @@
-const CACHE_NAME = "empire-quiz-v14";
+//service-worker.js
+
+const CACHE_NAME = "empire-quiz-v3";
 const staticUrlsToCache = [
   "./",
   "./index.html",
@@ -13,6 +15,10 @@ const staticUrlsToCache = [
   "./assets/Global.json",
   "./videos/clip.mp4",
   "./images/background.jpg",
+  "./images/avatars/egypt.png",
+  "./images/avatars/greek.png",
+  "./images/avatars/hebrew.png",
+  "./images/avatars/roman.png",
 ];
 
 self.addEventListener("install", event => {

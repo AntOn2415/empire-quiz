@@ -1,31 +1,29 @@
-import { showLoader, hideLoader, cacheDynamicFiles, updatePlayerStatsDisplay } from "../script.js";
+// scripts/result.js
+import { showLoader, hideLoader, updatePlayerStatsDisplay } from "./ui-handler.js";
+import { cacheDynamicFiles } from "./utils.js";
 
-// Функція для оновлення статистики у localStorage
 const updatePlayerStats = (playerName, character, isWin) => {
   try {
     const statsJSON = localStorage.getItem("player-stats");
     const playerStats = statsJSON ? JSON.parse(statsJSON) : {};
 
-    // Перевіряємо, чи існує гравець
-    if (!playerStats[playerName]) {
-      playerStats[playerName] = {};
+    const cleanedPlayerName = playerName.replace(/\s+/g, " ").trim();
+
+    if (!playerStats[cleanedPlayerName]) {
+      playerStats[cleanedPlayerName] = {};
     }
 
-    // Перевіряємо, чи існує статистика для цього персонажа
-    if (!playerStats[playerName][character]) {
-      playerStats[playerName][character] = { gamesWon: 0, gamesLost: 0 };
+    if (!playerStats[cleanedPlayerName][character]) {
+      playerStats[cleanedPlayerName][character] = { gamesWon: 0, gamesLost: 0 };
     }
 
-    // Оновлюємо лічильники
     if (isWin) {
-      playerStats[playerName][character].gamesWon += 1;
+      playerStats[cleanedPlayerName][character].gamesWon += 1;
     } else {
-      playerStats[playerName][character].gamesLost += 1;
+      playerStats[cleanedPlayerName][character].gamesLost += 1;
     }
 
-    // Зберігаємо оновлені дані у localStorage
     localStorage.setItem("player-stats", JSON.stringify(playerStats));
-    console.log("Статистика гравця оновлена:", playerStats[playerName]);
   } catch (e) {
     console.error("Помилка при оновленні статистики у localStorage:", e);
   }
@@ -45,17 +43,15 @@ export const showResult = async (
   const percentage = (correctAnswers / totalQuestions) * 100;
   const isWin = percentage >= 80;
 
-  // Отримуємо поточну статистику ПЕРЕД оновленням
   const statsJSON = localStorage.getItem("player-stats");
   const playerStats = statsJSON ? JSON.parse(statsJSON) : {};
-  const previousWins = playerStats[playerName]?.[selectedCharacter]?.gamesWon || 0;
-  const previousLosses = playerStats[playerName]?.[selectedCharacter]?.gamesLost || 0;
+  const cleanedPlayerName = playerName.replace(/\s+/g, " ").trim();
+  const previousWins = playerStats[cleanedPlayerName]?.[selectedCharacter]?.gamesWon || 0;
+  const previousLosses = playerStats[cleanedPlayerName]?.[selectedCharacter]?.gamesLost || 0;
 
-  // Оновлюємо статистику гравця
   updatePlayerStats(playerName, selectedCharacter, isWin);
   updatePlayerStatsDisplay();
 
-  // Визначаємо, чи це перша перемога/поразка для цього гравця та персонажа
   let isFirstResult;
   if (isWin) {
     isFirstResult = previousWins === 0;
@@ -76,7 +72,6 @@ export const showResult = async (
     Римлянин: "roman",
     Єврей: "hebrew",
   };
-
   let characterBaseName = characterNames[selectedCharacter] || "default";
 
   const getMessageText = (isFirst, isWin) => {
@@ -105,12 +100,11 @@ export const showResult = async (
         failure: {
           Єгиптянин: `На жаль, <span class="player-name">${playerName}</span>, навіть після повторної спроби, загадки Нілу залишилися нерозгаданими.`,
           Грек: `На жаль, <span class="player-name">${playerName}</span>, і вдруге тобі не вдалось пройти випробування стародавньої Греції.`,
-          Римлянин: `На жаль, <span class=\"player-name\">${playerName}</span>, завоювання Риму не вдалося і вдруге.`,
-          Єврей: `На жаль, <span class=\"player-name\">${playerName}</span>, ця спроба не принесла бажаного результату.`,
+          Римлянин: `На жаль, <span class="player-name">${playerName}</span>, завоювання Риму не вдалося і вдруге.`,
+          Єврей: `На жаль, <span class="player-name">${playerName}</span>, ця спроба не принесла бажаного результату.`,
         },
       },
     };
-
     if (isWin) {
       return isFirst
         ? messages.first.success[selectedCharacter]
@@ -124,14 +118,98 @@ export const showResult = async (
 
   const messageText = getMessageText(isFirstResult, isWin);
 
+  const incorrectAnswers = totalQuestions - correctAnswers;
+  let statsSummary = "";
+
+  const getRandomMessage = messagesArray => {
+    return messagesArray[Math.floor(Math.random() * messagesArray.length)];
+  };
+
+  const characterStats = {
+    Єгиптянин: {
+      allCorrect: [
+        `<i class="fas fa-gem"></i> Всі скарби знань — твої!`,
+        `<i class="fas fa-star-of-david"></i> Мудрість фараона!`,
+      ],
+      allIncorrect: [
+        `<i class="fas fa-times"></i> Загубився в пісках часу`,
+        `<i class="fas fa-sad-cry"></i> Таємниці Нілу не розкрито`,
+      ],
+      regular: [
+        `Правильних: ${correctAnswers}, неправильних: ${incorrectAnswers}.`,
+        `${correctAnswers} вірних відповідей, але ${incorrectAnswers} таємниць ще чекають свого часу.`,
+        `Ти розгадав ${correctAnswers} таємниць з ${totalQuestions}.`,
+      ],
+    },
+    Грек: {
+      allCorrect: [
+        `<i class="fas fa-bullseye"></i> Всі в яблучко!`,
+        `<i class="fas fa-feather-alt"></i> Олімп схвалює!`,
+      ],
+      allIncorrect: [
+        `<i class="fas fa-skull-crossbones"></i> Стріла пройшла мимо...`,
+        `<i class="fas fa-frown"></i> Олімп не підкорився`,
+      ],
+      regular: [
+        `Попав: ${correctAnswers}, мімо: ${incorrectAnswers}.`,
+        `З ${totalQuestions} стріл, ${correctAnswers} влучили в ціль!`,
+        `Ти йдеш до перемоги: ${correctAnswers} подвигів на рахунку. Залишилось: ${
+          totalQuestions - correctAnswers
+        }.`,
+      ],
+    },
+    Римлянин: {
+      allCorrect: [
+        `<i class="fas fa-crown"></i> Veni, Vidi, Vici!`,
+        `<i class="fas fa-shield-alt"></i> Бездоганна перемога!`,
+      ],
+      allIncorrect: [
+        `<i class="fas fa-times"></i> Цезар незадоволений`,
+        `<i class="fas fa-flag-checkered"></i> Поразка, але не кінець!`,
+      ],
+      regular: [
+        `Прийнято: ${correctAnswers}, відхилено: ${incorrectAnswers}.`,
+        `Твоя дисципліна: ${correctAnswers} влучних ударів з ${totalQuestions}!`,
+        `Ти на вірному шляху до завоювання: ${correctAnswers} перемог, ${incorrectAnswers} поразок.`,
+      ],
+    },
+    Єврей: {
+      allCorrect: [
+        `<i class="fas fa-praying-hands"></i> Істина знайдена!`,
+        `<i class="fas fa-star-of-david"></i> Всі відповіді мудрі!`,
+      ],
+      allIncorrect: [
+        `<i class="fas fa-question-circle"></i> Потрібна ще мудрість`,
+        `<i class="fas fa-times"></i> Невдача, але не поразка`,
+      ],
+      regular: [
+        `Твоя мудрість зростає: ${correctAnswers} правильних, ${incorrectAnswers} помилкових!`,
+        `Ти крок за кроком наближаєшся до істини: ${correctAnswers} вірних відповідей, ${incorrectAnswers} сумнівних.`,
+        `Ось твої знання: ${correctAnswers} з ${totalQuestions} істин.`,
+      ],
+    },
+  };
+
+  if (correctAnswers === totalQuestions) {
+    statsSummary = `<p class="stats-summary all-correct">${getRandomMessage(
+      characterStats[selectedCharacter].allCorrect
+    )}</p>`;
+  } else if (correctAnswers === 0) {
+    statsSummary = `<p class="stats-summary all-incorrect">${getRandomMessage(
+      characterStats[selectedCharacter].allIncorrect
+    )}</p>`;
+  } else {
+    statsSummary = `<p class="stats-summary mixed">${getRandomMessage(
+      characterStats[selectedCharacter].regular
+    )}</p>`;
+  }
+
   showLoader();
 
   try {
     const videoSuffix = percentage >= 80 ? "Happy" : "Angry";
     const videoSrc = `videos/${characterBaseName}${videoSuffix}.mp4`;
-
     cacheDynamicFiles([videoSrc]);
-
     resultVideo.src = videoSrc;
     resultVideo.load();
     resultVideo.addEventListener(
@@ -155,5 +233,5 @@ export const showResult = async (
     hideLoader();
   }
 
-  resultMessageElement.innerHTML = `<p>${messageText}</p>`;
+  resultMessageElement.innerHTML = `${messageText}${statsSummary}`;
 };

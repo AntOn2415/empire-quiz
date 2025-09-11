@@ -1,4 +1,6 @@
-import { showLoader, hideLoader, cacheDynamicFiles } from "../script.js";
+// scripts/character-selection.js
+import { showLoader, hideLoader } from "./ui-handler.js";
+import { cacheDynamicFiles } from "./utils.js";
 
 let mySwiper = null;
 
@@ -14,7 +16,6 @@ export async function setupCharacterSelection() {
   swiperWrapper.innerHTML = "";
   showLoader();
 
-  // Кешуємо всі 3D-моделі на початку
   const modelUrls = characters.map(char => char.model);
   cacheDynamicFiles(modelUrls);
 

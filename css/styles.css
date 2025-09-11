@@ -113,10 +113,6 @@ main {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-#character-selection #confirm-character:hover {
-  background-color: rgba(0, 86, 179, 0.8); /* Темніший колір при наведенні */
-}
-
 #background-video {
   position: absolute;
   top: 0;
@@ -208,10 +204,6 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #0056b3;
-}
-
 .model-container {
   width: 100%;
   height: 75%;
@@ -265,10 +257,6 @@ button:hover {
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
-.gender-btn:hover {
-  background: rgba(0, 0, 0, 0.4);
-}
-
 /* Єгипетська тема */
 main.theme-egypt .gender-btn.active {
   background-color: #d4ac0d; /* Золотий */
@@ -291,11 +279,6 @@ main.theme-roman .gender-btn.active {
 main.theme-hebrew .gender-btn.active {
   background-color: #2e86c1; /* Блакитний */
   border-color: #2e86c1;
-}
-
-/* Загальні стилі для hovered-стану кнопок статі */
-.gender-btn:hover {
-  background: rgba(0, 0, 0, 0.4);
 }
 
 #name-input input {
@@ -330,17 +313,15 @@ main.theme-hebrew .gender-btn.active {
   top: 0.4rem;
   left: 0.5rem;
   background: transparent;
-  color: #333;
+  color: #fff;
   font-size: 1.5rem;
   border: none;
   padding: 0.5rem;
   cursor: pointer;
 }
 
-.back-button:hover {
-  color: #007bff;
-}
 .question-block {
+  position: relative;
   margin-bottom: 1.5rem;
   padding: 1rem;
   border: 1px solid #eee;
@@ -364,20 +345,60 @@ main.theme-hebrew .gender-btn.active {
 }
 
 .quiz-option:hover {
-  background-color: #0056b3;
   transform: translateY(-2px);
 }
 
-.correct {
-  color: green;
-  font-weight: bold;
+.feedback-message {
+  position: absolute; /* Іконка виходить з потоку документа */
+  top: 50%; /* Позиціонування відносно верхнього краю батька */
+  left: 50%; /* Позиціонування відносно лівого краю батька */
+  transform: translate(-50%, -50%); /* Центрування по обох осях */
+
+  /* Додаткові стилі для видимості */
+  opacity: 0;
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in; /* Додаємо transform до переходу */
+  z-index: 10; /* Перекриває інші елементи */
 }
 
-.incorrect {
-  color: red;
-  font-weight: bold;
+.feedback-message.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1); /* Повертаємо scale до 1 при появі */
 }
 
+.feedback-message i {
+  font-size: 8rem; /* Можеш ще трохи збільшити, якщо хочеш, щоб було помітніше */
+  /* transform: scale(0.8); */ /* Початковий розмір іконки - трохи менше */
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Якщо хочеш ефект "пульсації" при появі */
+.feedback-message.show i {
+  animation: pulseIcon 0.6s ease-out forwards;
+}
+
+@keyframes pulseIcon {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Колір іконок */
+.feedback-message .correct-icon {
+  color: #28a745;
+}
+
+.feedback-message .incorrect-icon {
+  color: #dc3545;
+}
 /* ========================================= */
 /* Стилі для кнопки налаштувань та її обгортки */
 /* ========================================= */
@@ -394,26 +415,14 @@ main.theme-hebrew .gender-btn.active {
 }
 
 #bottom-buttons-container {
-  display: flex;
-  flex-direction: column-reverse; /* Кнопки знизу вгору */
-  gap: 15px;
-  /* Стилі для анімації появи/зникнення */
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(20px); /* Початкове зміщення для анімації */
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0.5s ease-out;
-}
-
-/* Коли utility-buttons-wrapper має клас visible-wrapper, кнопки стають видимими */
-#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0); /* Повертаємо на початкове місце */
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
 /* Сама кнопка налаштувань */
 #settings-button {
-  background: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для видимості */
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   width: 50px;
@@ -423,23 +432,22 @@ main.theme-hebrew .gender-btn.active {
   align-items: center;
   cursor: pointer;
   font-size: 1.5rem;
-  color: #fff;
+  color: rgba(255, 255, 255, 0.7);
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  transition: background 0.3s ease, transform 0.3s ease; /* Додаємо transform для анімації */
-}
-
-#settings-button:hover {
-  background: rgba(0, 0, 0, 0.4);
+  transition: background 0.3s ease, transform 0.3s ease;
+  position: relative; /* Додаємо, щоб була над іншими кнопками */
+  z-index: 1001;
 }
 
 /* Анімація повороту кнопки налаштувань */
 #settings-button.is-active {
-  transform: rotate(135deg); /* Поворот на 135 градусів при активності */
+  color: #fff;
+  transform: rotate(135deg);
 }
 
 /* Загальні стилі для кнопок всередині bottom-buttons-container */
 #bottom-buttons-container .btn {
-  background: rgba(0, 0, 0, 0.2); /* Напівпрозорий фон для видимості */
+  background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   width: 50px;
@@ -451,11 +459,33 @@ main.theme-hebrew .gender-btn.active {
   font-size: 1.5rem;
   color: #fff;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  transition: background 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s ease-out; /* Додаємо спеціальну функцію для анімації */
+  opacity: 0;
+  /* Початкове положення - там, де знаходиться #settings-button */
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 
-#bottom-buttons-container .btn:hover {
-  background: rgba(0, 0, 0, 0.4);
+/* Коли utility-buttons-wrapper має клас visible-wrapper, кнопки стають видимими та займають свої місця */
+#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container .btn {
+  opacity: 1;
+}
+
+/* Анімація для кожної кнопки окремо */
+#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container #toggle-music {
+  transform: translateY(-65px); /* Переміщуємо вгору на висоту + проміжок */
+  transition-delay: 0.1s;
+}
+
+#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container #toggle-effects {
+  transform: translateY(-130px); /* Вдвічі більше */
+  transition-delay: 0.2s;
+}
+
+#utility-buttons-wrapper.visible-wrapper #bottom-buttons-container #back-to-hero {
+  transform: translateY(-195px); /* Втричі більше */
+  transition-delay: 0.3s;
 }
 
 /* Класи для приховування */
@@ -681,14 +711,9 @@ main.theme-egypt #retry,
 main.theme-egypt #start-mission {
   background-color: #d4ac0d; /* Золотий */
 }
-
-main.theme-egypt .quiz-option:hover,
-main.theme-egypt #start-game:hover,
-main.theme-egypt #retry:hover,
-main.theme-egypt #start-mission:hover {
-  background-color: #b7950b; /* Темніше золото */
+main.theme-egypt h2 {
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6);
 }
-
 main.theme-egypt h3,
 main.theme-egypt h2,
 main.theme-egypt #result-message,
@@ -704,20 +729,16 @@ main.theme-greek #questions-overlay {
 main.theme-greek #mission-intro {
   background-color: rgba(240, 244, 247, 0.8);
 }
+
 main.theme-greek .quiz-option,
 main.theme-greek #start-game,
 main.theme-greek #retry,
 main.theme-greek #start-mission {
   background-color: #5d6d7e; /* Сіро-синій */
 }
-
-main.theme-greek .quiz-option:hover,
-main.theme-greek #start-game:hover,
-main.theme-greek #retry:hover,
-main.theme-greek #start-mission:hover {
-  background-color: #34495e; /* Темніше сіро-синій */
+main.theme-greek h2 {
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6);
 }
-
 main.theme-greek h3,
 main.theme-greek h2,
 main.theme-greek #result-message,
@@ -739,14 +760,9 @@ main.theme-roman #retry,
 main.theme-roman #start-mission {
   background-color: #c0392b; /* Червоний */
 }
-
-main.theme-roman .quiz-option:hover,
-main.theme-roman #start-game:hover,
-main.theme-roman #retry:hover,
-main.theme-roman #start-mission:hover {
-  background-color: #a93226; /* Темніше червоний */
+main.theme-roman h2 {
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6);
 }
-
 main.theme-roman h3,
 main.theme-roman h2,
 main.theme-roman #result-message,
@@ -768,14 +784,9 @@ main.theme-hebrew #retry,
 main.theme-hebrew #start-mission {
   background-color: #2e86c1; /* Блакитний */
 }
-
-main.theme-hebrew .quiz-option:hover,
-main.theme-hebrew #start-game:hover,
-main.theme-hebrew #retry:hover,
-main.theme-hebrew #start-mission:hover {
-  background-color: #21618c; /* Темніше блакитний */
+main.theme-hebrew h2 {
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6);
 }
-
 main.theme-hebrew h3,
 main.theme-hebrew h2,
 main.theme-hebrew #result-message,
@@ -842,7 +853,7 @@ main.theme-hebrew #mission-intro p {
 }
 
 #result-message {
-  font-size: 1.5rem;
+  font-size: 1rem;
   margin-bottom: 2rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
   color: white; /* Базовий колір для повідомлення */
@@ -864,9 +875,7 @@ main.theme-egypt #result-message {
 main.theme-egypt #retry {
   background-color: #d4ac0d; /* Золота кнопка */
 }
-main.theme-egypt #retry:hover {
-  background-color: #b7950b; /* Темніше золото */
-}
+
 main.theme-egypt #result .bottom-content {
   background-color: rgba(255, 249, 230, 0.8);
   color: #6a0505;
@@ -882,9 +891,7 @@ main.theme-greek #result-message {
 main.theme-greek #retry {
   background-color: #5d6d7e; /* Сіро-синя кнопка */
 }
-main.theme-greek #retry:hover {
-  background-color: #34495e; /* Темніше сіро-синій */
-}
+
 main.theme-greek #result .bottom-content {
   background-color: rgba(240, 244, 247, 0.8);
   color: #1a5276;
@@ -900,9 +907,7 @@ main.theme-roman #result-message {
 main.theme-roman #retry {
   background-color: #c0392b; /* Червона кнопка */
 }
-main.theme-roman #retry:hover {
-  background-color: #a93226; /* Темніше червоний */
-}
+
 main.theme-roman #result .bottom-content {
   background-color: rgba(252, 241, 241, 0.8);
   color: #88451b;
@@ -918,9 +923,7 @@ main.theme-hebrew #result-message {
 main.theme-hebrew #retry {
   background-color: #2e86c1; /* Блакитна кнопка */
 }
-main.theme-hebrew #retry:hover {
-  background-color: #21618c; /* Темніше блакитний */
-}
+
 main.theme-hebrew #result .bottom-content {
   background-color: rgba(230, 240, 255, 0.8);
   color: #1f618d;
@@ -962,9 +965,6 @@ main.theme-hebrew #result .bottom-content {
   transition: background 0.3s ease;
 }
 
-.footer-btn:hover {
-  background: rgba(0, 0, 0, 0.4);
-}
 /* Loader styles */
 .loader-container {
   position: fixed;
@@ -1269,6 +1269,11 @@ main.theme-hebrew #result .bottom-content {
 .stats-label.loss i {
   color: #dc3545; /* Колір поразки */
 }
+
+.stats-summary.mixed,
+.stats-summary.all-incorrect {
+  font-size: 1.3rem;
+}
 /* ========================================= */
 /* Стилі для картки перемоги */
 /* ========================================= */
@@ -1332,7 +1337,6 @@ main.theme-hebrew #result .bottom-content {
 }
 
 .player-card:hover {
-  background-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
 }
 
@@ -1444,6 +1448,44 @@ main.theme-hebrew #result .bottom-content {
   transition: background-color 0.3s ease;
 }
 
-#clear-stats-btn:hover {
-  background-color: #c82333;
+/* Анімація зникнення і появи для контейнера питань */
+@keyframes magicalFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes magicalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.magical-fade-out {
+  animation: magicalFadeOut 0.8s ease-out forwards;
+}
+
+.magical-fade-in {
+  animation: magicalFadeIn 0.8s ease-out forwards;
+}
+#hero h2 {
+  color: #333; /* Темний колір для гарного контрасту на білому */
+  font-size: 2em; /* Збільшимо розмір, щоб краще виділявся */
+  font-weight: 800; /* Зробимо шрифт дуже товстим */
+  text-transform: uppercase; /* Всі літери заглавні */
+  text-align: center; /* Центруємо текст */
+
+  /* Оновлена тінь для тексту */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
+    /* Основна, помітна тінь */ -2px -2px 4px rgba(255, 255, 255, 0.3); /* Легке світло, щоб "підняти" текст */
 }
